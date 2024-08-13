@@ -76,6 +76,8 @@ class Application:
 
         # --------------------------------------------------------------
 
+        self._print_footer()
+
     def _print_banner(self) -> None:
         # Imprime el banner del programa
 
