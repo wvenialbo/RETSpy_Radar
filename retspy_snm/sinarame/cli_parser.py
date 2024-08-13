@@ -37,20 +37,13 @@ class CustomArgumentParser(ArgumentParser):
         )
 
         parser.add_argument(
-            "init",
-            nargs="?",
-            const=True,
-            default=False,
-            help="Inicializar el directorio de trabajo",
-        )
-
-        parser.add_argument(
             "-v",
             "--version",
             action="version",
             version=f"%(prog)s {info.version_short}",
             help="Muestra la versión del programa y termina.",
         )
+
         parser.add_argument(
             "-h",
             "--help",
@@ -133,6 +126,36 @@ class CustomArgumentParser(ArgumentParser):
             "estaciones de radar del SINARAME, por defecto es el grupo "
             "de estaciones de prueba: 'retspy'.",
             default=cls.DEFAULT_STATIONS,
+        )
+
+        subparser = parser.add_subparsers(
+            dest="init", help="Inicializa el directorio de trabajo."
+        )
+
+        init_parser = subparser.add_parser(
+            "init",
+            prog=info.name,
+            description=f"{info.lemma}:\n\n{info.description}",
+            epilog="Hecho por el equipo de desarrollo de RETSPy.\n"
+            "Copyright (C) 2024.",
+            add_help=False,
+            usage="%(prog)s init [opciones]",
+        )
+
+        init_parser.add_argument(
+            "-v",
+            "--version",
+            action="version",
+            version=f"%(prog)s {info.version_short}",
+            help="Muestra la versión del programa y termina.",
+        )
+
+        init_parser.add_argument(
+            "-h",
+            "--help",
+            action="help",
+            default=SUPPRESS,
+            help="Muestra este mensaje de ayuda y termina.",
         )
 
         return parser
