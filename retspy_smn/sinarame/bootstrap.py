@@ -30,7 +30,7 @@ class Bootstrap:
         # y sale; toma precedencia sobre cualquier otro argumento
 
         if namespace.init:
-            self._initialize_workspace()
+            self._initialize_workspace(namespace)
 
             return Settings(validate=False)
 
@@ -71,12 +71,12 @@ class Bootstrap:
                 "El archivo de configuración no es el correcto"
             )
 
-    def _initialize_workspace(self) -> None:
+    def _initialize_workspace(self, namespace: CLINamespace) -> None:
         # Crear el archivo de configuración si no existe. Si existe,
         # preguntar al usuario si se desea sobrescribir. En caso
         # afirmativo se sobrescribirá con los valores predeterminados
 
-        user_settings_path: str = path.join(
+        user_settings_path: str = namespace.config_path or path.join(
             self._settings.current_dir, info.user_settings
         )
 

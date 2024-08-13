@@ -59,7 +59,7 @@ class CustomArgumentParser(ArgumentParser):
             type=str,
             help="Ruta del archivo de configuración del indexador. "
             "Si se especifica este argumento, se ignora el archivo "
-            "de configuración por defecto del indexador.",
+            "de configuración del usuario en la carpeta de trabajo.",
             default=None,
         )
 
@@ -129,7 +129,12 @@ class CustomArgumentParser(ArgumentParser):
         )
 
         subparser = parser.add_subparsers(
-            dest="init", help="Inicializa el directorio de trabajo."
+            dest="init",
+            help="Inicializa el directorio de trabajo "
+            "crea una copia del archivo de configuración con los "
+            "valores por defecto en la carpeta de trabajo. El usuario "
+            "puede modificar los valores de configuración según sus "
+            "necesidades.",
         )
 
         init_parser = subparser.add_parser(
@@ -156,6 +161,18 @@ class CustomArgumentParser(ArgumentParser):
             action="help",
             default=SUPPRESS,
             help="Muestra este mensaje de ayuda y termina.",
+        )
+
+        init_parser.add_argument(
+            "-c" "--config-path",
+            dest="config_path",
+            metavar=cls.FILE_PATH,
+            type=str,
+            help="Crea una copia del archivo de configuración con los "
+            "valores por defecto en la ruta indicada. Si se especifica "
+            "esta opción, se ignora la creación del archivo de "
+            "configuración del usuario en la carpeta de trabajo.",
+            default=None,
         )
 
         return parser
