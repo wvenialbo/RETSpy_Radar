@@ -3,7 +3,7 @@ from typing import Any, Callable
 from requests import Response, Session
 
 
-class RequestsBase:
+class RequestBase:
     """
     Realiza solicitudes HTTP.
 
@@ -250,7 +250,7 @@ class RequestsBase:
         target_url: str = self._base_url + url
         headers = headers or self._headers
 
-        response: Response = request(target_url, headers, **kwargs)
+        response: Response = request(target_url, headers=headers, **kwargs)
 
         self._status_code = response.status_code
 

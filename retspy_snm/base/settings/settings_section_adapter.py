@@ -37,7 +37,9 @@ class SettingsSectionAdapter(SettingsSection):
         """
         self._section: dict[str, Any] = section
 
-    def add_section(self, key: str, section: "Section") -> None:
+    def add_subsection(
+        self, key: str, section: "Section | dict[str, Any]"
+    ) -> None:
         """
         Agrega una subsección a la sección de ajustes de configuración.
 
@@ -45,7 +47,7 @@ class SettingsSectionAdapter(SettingsSection):
         ----------
         key : str
             La clave de la subsección.
-        section : Section
+        section : Section | dict[str, Any]
             La subsección de ajustes de configuración.
 
         Raises
@@ -59,7 +61,18 @@ class SettingsSectionAdapter(SettingsSection):
         if key in self._section:
             raise ValueError(f"La clave '{key}' ya existe en la sección.")
 
-        self._section[key] = section.to_dict()
+        try:
+            if isinstance(section, dict):
+                json.dumps(section)
+                self._section[key] = section
+            else:
+                json.dumps(section.to_dict())
+                self._section[key] = section.to_dict()
+
+        except TypeError as exc:
+            raise ValueError(
+                "Los valores de ajuste de configuración no son válidos."
+            ) from exc
 
     def add_value(self, key: str, value: Any) -> None:
         """
@@ -95,6 +108,28 @@ class SettingsSectionAdapter(SettingsSection):
             raise ValueError("El valor no puede ser un diccionario.")
 
         self._section[key] = value
+
+    def create_subsection(self, key: str) -> None:
+        """
+        Agrega una subsección a la sección de ajustes de configuración.
+
+        Parameters
+        ----------
+        key : str
+            La clave de la subsección.
+
+        Raises
+        ------
+        ValueError
+            Si la clave ya existe en la sección.
+        """
+        # Crear una nueva sección si la clave no existe, de lo contrario
+        # lanzar una excepción.
+
+        if key in self._section:
+            raise ValueError(f"La clave '{key}' ya existe en la sección.")
+
+        self._section[key] = dict()
 
     def has(self, key: str) -> bool:
         """

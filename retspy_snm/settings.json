@@ -9,7 +9,7 @@
     },
     "server": {
         "base_url": "https://www.smn.gob.ar/",
-        "radar_url": "https://www.smn.gob.ar/radar",
+        "radar_url": "https://www.smn.gob.ar/radar/",
         "inventory_url": "https://ws1.smn.gob.ar/v1/images/radar/",
         "repository_url": "https://estaticos.smn.gob.ar/vmsr/radar/"
     },
@@ -19,67 +19,52 @@
         "repository_path": "./"
     },
     "timing": {
-        "units": "milliseconds",
+        "units": "millisecond",
         "wait_for_next_request": 1000,
         "wait_for_next_authorization": 2000,
         "scan_interval": 60000
     },
-    "station_groups": [
-        {
-            "name": "mosaicos",
-            "stations": [
-                "COMP_ARG",
-                "COMP_CEN",
-                "COMP_NOR"
-            ]
-        },
-        {
-            "name": "norte",
-            "stations": [
-                "PAR_240",
-                "PER_240",
-                "RMA1_240",
-                "RMA2_240",
-                "RMA3_240",
-                "RMA4_240",
-                "RMA5_240",
-                "RMA8_240",
-                "RMA11_240",
-                "RMA15_240"
-            ]
-        },
-        {
-            "name": "centro",
-            "stations": [
-                "PAR_240",
-                "PER_240",
-                "RMA1_240",
-                "RMA2_240",
-                "RMA6_240",
-                "RMA7_240",
-                "RMA8_240",
-                "RMA10_240",
-                "RMA12_240",
-                "RMA15_240"
-            ]
-        },
-        {
-            "name": "sur",
-            "stations": [
-                "ANG_240",
-                "RMA9_240"
-            ]
-        },
-        {
-            "name": "retspy",
-            "stations": [
-                "RMA3_240",
-                "RMA4_240",
-                "RMA5_240",
-                "RMA8_240"
-            ]
-        }
-    ],
+    "station_groups": {
+        "mosaicos": [
+            "COMP_ARG",
+            "COMP_CEN",
+            "COMP_NOR"
+        ],
+        "norte": [
+            "PAR_240",
+            "PER_240",
+            "RMA1_240",
+            "RMA2_240",
+            "RMA3_240",
+            "RMA4_240",
+            "RMA5_240",
+            "RMA8_240",
+            "RMA11_240",
+            "RMA15_240"
+        ],
+        "centro": [
+            "PAR_240",
+            "PER_240",
+            "RMA1_240",
+            "RMA2_240",
+            "RMA6_240",
+            "RMA7_240",
+            "RMA8_240",
+            "RMA10_240",
+            "RMA12_240",
+            "RMA15_240"
+        ],
+        "sur": [
+            "ANG_240",
+            "RMA9_240"
+        ],
+        "retspy": [
+            "RMA3_240",
+            "RMA4_240",
+            "RMA5_240",
+            "RMA8_240"
+        ]
+    },
     "stations": {
         "ANG_240": {
             "name": "Anguil (La Pampa)",

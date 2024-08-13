@@ -7,16 +7,13 @@ from ..base.exceptions import (
     UninitializedWorkspaceError,
 )
 from ..base.settings import Section
+from ..base.utils import console
 from .application_info import info
 from .cli_parser import CLINamespace, Parser
 from .settings_smn import SettingsSMN as Settings
 
 
 class Bootstrap:
-
-    YES = "Sí"
-    NO = "No"
-    YES_NO: list[str] = [YES, NO]
 
     def __init__(self, settings: Settings) -> None:
         self._settings: Settings = settings
@@ -35,7 +32,7 @@ class Bootstrap:
         if namespace.init:
             self._initialize_workspace()
 
-            return Settings()
+            return Settings(validate=False)
 
         # Si se especifica un archivo de configuración alternativo, se
         # carga y se sobrescriben los valores predeterminados
@@ -63,21 +60,6 @@ class Bootstrap:
 
         return self._settings
 
-    @staticmethod
-    def _ask_user(question: str, expect: list[str]) -> str:
-        expect_lower: list[str] = [option.lower() for option in expect]
-
-        choices: str = "/".join(expect)
-
-        query_message: str = f"{question} ({choices}): "
-
-        answer: str = ""
-
-        while answer not in expect_lower:
-            answer = input(query_message).strip().lower()
-
-        return answer
-
     def _check_settings(self) -> None:
         if not self._settings.has("model"):
             raise UninitializedWorkspaceError(
@@ -99,13 +81,13 @@ class Bootstrap:
         )
 
         if path.exists(user_settings_path):
-            overwrite: str = self._ask_user(
+            overwrite: str = console.prompt(
                 "El archivo de configuración ya existe. "
                 "¿Desea sobrescribirlo?",
-                self.YES_NO,
+                console.YES_NO,
             )
 
-            if self._response_is(overwrite, self.NO):
+            if console.response_is(overwrite, console.NO):
                 return
 
         # Copiar el archivo de configuración predeterminado al espacio
@@ -114,6 +96,12 @@ class Bootstrap:
         default_settings_path: str = path.join(
             self._settings.install_dir, info.default_settings
         )
+
+        if not path.exists(default_settings_path):
+            raise FileNotFoundError(
+                f"El archivo de configuración predeterminado no existe: "
+                f"'{default_settings_path}'"
+            )
 
         shutil.copyfile(default_settings_path, user_settings_path)
 
@@ -131,22 +119,19 @@ class Bootstrap:
 
         return settings
 
-    @staticmethod
-    def _response_is(response: str, expected: str) -> bool:
-        return response.strip().lower() == expected.strip().lower()
-
     def _setup_arguments(self, namespace: CLINamespace) -> None:
         # Configurar los argumentos de la línea de comandos
 
-        if namespace.start_time:
-            self._settings.section("args").update(
-                {
-                    "start_time": namespace.start_time,
-                    "end_time": namespace.end_time,
-                    "scan_period": namespace.scan_period,
-                    "station_ids": namespace.station_ids,
-                }
-            )
+        self._settings.create_subsection("args")
+
+        self._settings.section("args").update(
+            {
+                "start_time": namespace.start_time,
+                "end_time": namespace.end_time,
+                "scan_period": namespace.scan_period,
+                "station_ids": namespace.station_ids,
+            }
+        )
 
     def _setup_output_directory(self, namespace: CLINamespace) -> None:
         # Obtener el directorio de salida para las imágenes descargadas
@@ -170,12 +155,12 @@ class Bootstrap:
         # se desea crearlo.
 
         if not path.exists(output_dir):
-            overwrite: str = self._ask_user(
+            overwrite: str = console.prompt(
                 "El directorio de salida no existe. ¿Desea crearlo?",
-                self.YES_NO,
+                console.YES_NO,
             )
 
-            if self._response_is(overwrite, self.NO):
+            if console.response_is(overwrite, console.NO):
                 raise UninitializedOutputDirError(
                     "El directorio de salida no existe"
                 )

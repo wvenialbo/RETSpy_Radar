@@ -1,7 +1,7 @@
 class ApplicationInfo:
     """Información de la aplicación."""
 
-    name: str = "robot_smn"
+    name: str = "retspy_snm"
     alias: str = "RETSPy"
     version_short: str = "1.0.1"
     detail: str = "Indexador SINARAME"

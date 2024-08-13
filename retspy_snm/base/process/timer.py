@@ -71,6 +71,15 @@ class ProcessTimer:
 
         return current_time - self._next_time + self._scan_period
 
+    def skip(self) -> None:
+        """
+        Establece el temporizador en el inicio del siguiente ciclo.
+
+        Avanza el temporizador al inicio del siguiente ciclo de la
+        rutina.
+        """
+        self._next_time += self._scan_period
+
     def rewind(self) -> None:
         """
         Establece el temporizador en el inicio del ciclo actual.
@@ -88,6 +97,13 @@ class ProcessTimer:
         rutina.
         """
         timing.wait_until(self._start_time)
+
+        current_time: datetime = timing.current_time()
+
+        while self._next_time < current_time:
+            self.skip()
+
+        self.rewind()
 
     def stop(self) -> bool:
         """
@@ -117,6 +133,6 @@ class ProcessTimer:
 
         timing.wait_until(self._next_time)
 
-        self._next_time += self._scan_period
+        self.skip()
 
         return False

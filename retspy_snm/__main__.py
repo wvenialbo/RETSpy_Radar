@@ -7,11 +7,14 @@ Si no se proveen argumentos, se utilizarán los valores por defecto. Para
 más información, ejecute el script con la opción -h o --help.
 """
 
+from logging import Logger
+
 from .base.exceptions import (
     InvalidConfigurationFileError,
     UninitializedOutputDirError,
     UninitializedWorkspaceError,
 )
+from .base.logging.logger import get_logger
 from .sinarame import Application, ApplicationInfo, Bootstrap
 from .sinarame import SettingsSMN as Settings
 from .sinarame import Startup
@@ -24,6 +27,8 @@ def main() -> None:
     Ejecuta los procesos de inicio y arranque de la aplicación, y
     posteriormente inicia la aplicación.
     """
+    logger: Logger = get_logger(ApplicationInfo.name)
+
     try:
         startup_routines = Startup(__file__)
         settings: Settings = startup_routines.run()
@@ -38,20 +43,23 @@ def main() -> None:
         application_process.run(__name__)
 
     except InvalidConfigurationFileError as exc:
-        print(f"No se pudo cargar el archivo de configuración: {exc}")
+        logger.error(f"No se pudo cargar el archivo de configuración: {exc}")
 
     except UninitializedOutputDirError as exc:
-        print(f"El espacio de trabajo no se ha inicializado: {exc}")
+        logger.error(f"El espacio de trabajo no se ha inicializado: {exc}")
 
     except UninitializedWorkspaceError as exc:
-        print(f"El espacio de trabajo no se ha inicializado: {exc}")
-        print(
+        logger.error(f"El espacio de trabajo no se ha inicializado: {exc}")
+        logger.info(
             f"Ejecuta el comando '{ApplicationInfo.name} init' "
             "para inicializar el espacio de trabajo."
         )
 
+    except KeyboardInterrupt:
+        logger.info("El usuario ha interrumpido la ejecución del programa.")
+
     except Exception as exc:
-        print(f"No se puede continuar: Error inesperado: {exc}")
+        logger.critical(f"No se puede continuar: Error inesperado: {exc}")
         exit(1)
 
 

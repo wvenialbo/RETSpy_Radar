@@ -70,6 +70,8 @@ class RobotBase(ABC):
         pendent: set[str] = set()
         retry: set[str] = set()
 
+        self._prepare_process()
+
         while not timer.stop():
             try:
                 # Obtener la lista de imágenes disponibles de cada
@@ -105,6 +107,8 @@ class RobotBase(ABC):
 
                 retry = retry.union(pendent)
 
+                self._prepare_next_cycle()
+
             except AuthorizationExpiredError:
                 # Si el token de acceso expiró, obtener un nuevo token
                 # de acceso, reponer el inicio del ciclo actual, y
@@ -113,6 +117,17 @@ class RobotBase(ABC):
                 access_token = self._get_access_token(API_KEY, True)
 
                 timer.rewind()
+
+        self._finalize_process()
+
+    @abstractmethod
+    def _finalize_process(self) -> None:
+        """
+        Finaliza el proceso de recolección de datos.
+
+        Realiza las operaciones necesarias para finalizar el proceso
+        de recolección de datos.
+        """
 
     @abstractmethod
     def _get_access_token(self, api_key: str, renew: bool) -> str:
@@ -229,4 +244,22 @@ class RobotBase(ABC):
         -------
         str
             La ruta del repositorio de datos.
+        """
+
+    @abstractmethod
+    def _prepare_next_cycle(self) -> None:
+        """
+        Prepara el siguiente ciclo de recolección de datos.
+
+        Realiza las operaciones necesarias para preparar el siguiente
+        ciclo de recolección de datos.
+        """
+
+    @abstractmethod
+    def _prepare_process(self) -> None:
+        """
+        Prepara el proceso de recolección de datos.
+
+        Realiza las operaciones necesarias para preparar el proceso de
+        recolección de datos.
         """

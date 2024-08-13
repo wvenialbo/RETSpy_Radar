@@ -80,6 +80,15 @@ class RobotSMN(RobotBase):
 
         return image_set
 
+    def _finalize_process(self) -> None:
+        """
+        Finaliza el proceso de recolección de datos.
+
+        Realiza las operaciones necesarias para finalizar el proceso
+        de recolección de datos.
+        """
+        self._logger.info("Proceso de recolección de datos finalizado.")
+
     def _get_access_token(self, api_key: str, renew: bool) -> str:
         """
         Obtiene o renueva un token de acceso.
@@ -136,6 +145,8 @@ class RobotSMN(RobotBase):
                 self._save_token_to_file(
                     self._settings.CREDENTIALS_PATH, token
                 )
+
+            self._logger.info("Token de acceso obtenido correctamente.")
 
             return token
 
@@ -247,6 +258,8 @@ class RobotSMN(RobotBase):
 
         pendent_set: set[str] = image_set.copy()
 
+        self._logger.info(f"Descargando {len(image_set)} nuevas imágenes.")
+
         for image_name in image_set:
             # Esperar un tiempo para no saturar el servidor y evitar ser
             # bloqueado, luego descargar y guardar cada imagen pendiente
@@ -258,6 +271,10 @@ class RobotSMN(RobotBase):
                 pendent_set.remove(image_name)
 
                 self._save_image(image_name, image_data)
+
+                self._logger.info(
+                    f"Imagen '{image_name}' descargada exitosamente."
+                )
 
             except RequestError as exc:
                 if exc.status_code in {401}:
@@ -347,6 +364,24 @@ class RobotSMN(RobotBase):
         raise InvalidConfigurationFileError(
             "El archivo de credenciales no contiene un token de acceso."
         )
+
+    def _prepare_next_cycle(self) -> None:
+        """
+        Prepara el siguiente ciclo de recolección de datos.
+
+        Realiza las operaciones necesarias para preparar el siguiente
+        ciclo de recolección de datos.
+        """
+        self._logger.info("Esperando el siguiente ciclo de recolección.")
+
+    def _prepare_process(self) -> None:
+        """
+        Prepara el proceso de recolección de datos.
+
+        Realiza las operaciones necesarias para preparar el proceso de
+        recolección de datos.
+        """
+        self._logger.info("Preparando el proceso de recolección de datos.")
 
     def _save_image(self, image_name: str, image_data: Iterator[Any]) -> None:
         """

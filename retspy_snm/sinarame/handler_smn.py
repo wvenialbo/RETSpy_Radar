@@ -42,6 +42,8 @@ class RequestsHandlerSNM(RequestsHandlerBase):
         settings : SettingsSMN
             La configuración de la aplicación.
         """
+        super().__init__()
+
         self._settings: SettingsSMN = settings
 
     def download_image(self, image_name: str) -> Iterator[Any]:
@@ -173,7 +175,7 @@ class RequestsHandlerSNM(RequestsHandlerBase):
             # Realizar la solicitud HTTP para obtener la lista de
             # imágenes
 
-            REQUEST_URL: str = f"{self._settings.radar_url}{station_id}"
+            REQUEST_URL: str = f"{self._settings.inventory_url}{station_id}"
 
             REQUEST_HEADERS: dict[str, str] = (
                 self._settings.IMAGE_SET_HEADERS

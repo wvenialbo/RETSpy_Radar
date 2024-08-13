@@ -33,6 +33,18 @@ class SettingsValueAdapter:
         """
         self._value: Any = value
 
+    def __bool__(self) -> bool:
+        """
+        Indica si el valor de ajuste de configuración no está vacío.
+
+        Returns
+        -------
+        bool
+            `True` si el valor de ajuste de configuración no está
+            vacío, `False` en caso contrario.
+        """
+        return bool(self._value) if self._value is not None else False
+
     def __str__(self) -> str:
         """
         Retorna una representación en cadena del valor de ajuste de
@@ -44,7 +56,7 @@ class SettingsValueAdapter:
             La representación en cadena del valor de ajuste de
             configuración.
         """
-        return str(self._value)
+        return str(self._value) if self._value is not None else ""
 
     def as_type(self, type_: Type[T]) -> T:
         """

@@ -1,4 +1,4 @@
-from .requests_base import RequestsBase
+from .request_base import RequestBase
 
 
 class RequestsHandlerBase:
@@ -18,7 +18,7 @@ class RequestsHandlerBase:
         Obtiene el código de estado de la última solicitud HTTP.
     """
 
-    def __init__(self, request: RequestsBase | None = None) -> None:
+    def __init__(self, request: RequestBase | None = None) -> None:
         """
         Inicializa una nueva instancia del manejador de solicitudes.
 
@@ -27,10 +27,10 @@ class RequestsHandlerBase:
         request : RequestsBase, optional
             Objeto para realizar solicitudes HTTP.
         """
-        self._request: RequestsBase = request or RequestsBase()
+        self._request: RequestBase = request or RequestBase()
 
     @property
-    def request(self) -> RequestsBase:
+    def request(self) -> RequestBase:
         """
         Obtiene el objeto que realiza solicitudes HTTP.
 

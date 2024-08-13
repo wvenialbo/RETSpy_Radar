@@ -38,7 +38,7 @@ class SettingsSMN(SettingsBasic):
         ),
         "sec-ch-ua-mobile": "?0",
         "sec-ch-ua-platform": '"Windows"',
-        "referrer": "https://www.smn.gob.ar/",
+        "referer": "https://www.smn.gob.ar/",
         "referrerPolicy": "strict-origin-when-cross-origin",
         "mode": "cors",
     }
@@ -73,12 +73,13 @@ class SettingsSMN(SettingsBasic):
         BASE_HEADERS | IMAGE_HEADERS | COMMON_HEADERS
     )
 
-    def __init__(self, settings: dict[str, Any] | None = None) -> None:
+    def __init__(
+        self, settings: dict[str, Any] | None = None, validate: bool = True
+    ) -> None:
         super().__init__(settings or dict())
 
-        self._validate()
-
-        self._version: str = self.value("version").as_type(str)
+        if validate:
+            self._validate()
 
     @classmethod
     def load(
@@ -94,7 +95,9 @@ class SettingsSMN(SettingsBasic):
         """
         basic: SettingsBasic = super().load(settings_path, fail_if_not_exists)
 
-        return SettingsSMN(basic.root.to_dict())
+        validate: bool = fail_if_not_exists or bool(basic)
+
+        return SettingsSMN(basic.root.to_dict(), validate)
 
     def _validate(self) -> None:
         """
@@ -106,6 +109,8 @@ class SettingsSMN(SettingsBasic):
             Si alguna configuración no es válida.
         """
         try:
+            assert self.has("model")
+
             assert self.value("model").as_type(str) == "sinarame"
             assert self.value("version").as_type(str) == "1.0"
 
@@ -116,9 +121,14 @@ class SettingsSMN(SettingsBasic):
             assert self.has("station_groups")
             assert self.has("stations")
 
+        except KeyError as exc:
+            raise InvalidConfigurationFileError(
+                f"La clave {exc} no existe en el archivo de configuración"
+            )
+
         except AssertionError:
             raise InvalidConfigurationFileError(
-                "El archivo de configuración no es válido."
+                "El archivo de configuración no es válido"
             )
 
     @property
@@ -155,7 +165,7 @@ class SettingsSMN(SettingsBasic):
         str
             La hora de fin de la recolección de datos.
         """
-        return self.section("args").value("end_time").as_type(str)
+        return str(self.section("args").value("end_time"))
 
     @property
     def install_dir(self) -> str:
@@ -180,6 +190,18 @@ class SettingsSMN(SettingsBasic):
             La URL del conjunto de imágenes disponibles.
         """
         return self.section("server").value("inventory_url").as_type(str)
+
+    @property
+    def output_dir(self) -> str:
+        """
+        Obtiene la ruta del directorio de salida de las imágenes.
+
+        Returns
+        -------
+        str
+            La ruta del directorio de salida de las imágenes.
+        """
+        return self.section("path").value("output_dir").as_type(str)
 
     @property
     def radar_url(self) -> str:
@@ -246,7 +268,7 @@ class SettingsSMN(SettingsBasic):
         str
             El período de escaneo de las imágenes.
         """
-        return self.section("args").value("scan_period").as_type(str)
+        return str(self.section("args").value("scan_period"))
 
     @property
     def start_time(self) -> str:
@@ -258,7 +280,7 @@ class SettingsSMN(SettingsBasic):
         str
             La hora de inicio de la recolección de datos.
         """
-        return self.section("args").value("start_time").as_type(str)
+        return str(self.section("args").value("start_time"))
 
     @property
     def station_ids(self) -> list[str]:
@@ -271,6 +293,18 @@ class SettingsSMN(SettingsBasic):
             Los identificadores de las estaciones a escanear.
         """
         return self.section("args").value("station_ids").as_type(list[str])
+
+    @property
+    def version(self) -> str:
+        """
+        Obtiene la versión del esquema del archivo de configuración.
+
+        Returns
+        -------
+        str
+            La versión del esquema del archivo de configuración.
+        """
+        return self.value("version").as_type(str)
 
     @property
     def wait_for_next_authorization(self) -> float:

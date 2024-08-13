@@ -18,7 +18,7 @@ COLOR: dict[int, str] = {
     logging.INFO: GREEN,
     logging.WARNING: YELLOW,
     logging.ERROR: ORANGE,
-    logging.CRITICAL: RED,
+    logging.CRITICAL: LIGHT_RED,
 }
 
 HEAD = "%(asctime)s - "

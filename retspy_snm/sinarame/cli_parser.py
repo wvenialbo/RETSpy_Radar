@@ -20,7 +20,6 @@ class CustomArgumentParser(ArgumentParser):
     ISO_DATE_TIME: str = "ISO_DATE_TIME"
     ISO_TIME_PERIOD: str = "ISO_TIME_PERIOD"
     ID_STRING: str = "ID_STRING"
-    ID_LIST: str = f"{ID_STRING}, {ID_STRING}, ..."
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
@@ -31,7 +30,7 @@ class CustomArgumentParser(ArgumentParser):
     def get_parser(cls) -> "CustomArgumentParser":
         parser = CustomArgumentParser(
             prog=info.name,
-            description=f"{info.lemma}\n\n{info.description}",
+            description=f"{info.lemma}:\n\n{info.description}",
             epilog="Hecho por el equipo de desarrollo de RETSPy.\n"
             "Copyright (C) 2024.",
             add_help=False,
@@ -127,7 +126,7 @@ class CustomArgumentParser(ArgumentParser):
             "-S",
             "--stations",
             dest="station_ids",
-            metavar=cls.ID_LIST,
+            metavar=cls.ID_STRING,
             nargs="+",
             type=set[str],
             help="Lista de identificadores de estaciones o grupos de "

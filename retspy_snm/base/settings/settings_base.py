@@ -50,6 +50,61 @@ class SettingsBase(SettingsSection):
         """
         self._root = Section(settings)
 
+    def add_subsection(
+        self, key: str, section: "Section | dict[str, Any]"
+    ) -> None:
+        """
+        Agrega una subsección a la sección de ajustes de configuración.
+
+        Parameters
+        ----------
+        key : str
+            La clave de la subsección.
+        section : Section | dict[str, Any]
+            La subsección de ajustes de configuración.
+
+        Raises
+        ------
+        ValueError
+            Si la clave ya existe en la sección.
+        """
+        self._root.add_subsection(key, section)
+
+    def add_value(self, key: str, value: Any) -> None:
+        """
+        Agrega un valor a la sección de ajustes de configuración.
+
+        Parameters
+        ----------
+        key : str
+            La clave del valor.
+        value : Value
+            El valor de ajuste de configuración.
+
+        Raises
+        ------
+        ValueError
+            Si la clave ya existe en la sección o si el valor es un
+            diccionario.
+        """
+        self._root.add_value(key, value)
+
+    def create_subsection(self, key: str) -> None:
+        """
+        Agrega una subsección a la sección de ajustes de configuración.
+
+        Parameters
+        ----------
+        key : str
+            La clave de la subsección.
+
+        Raises
+        ------
+        ValueError
+            Si la clave ya existe en la sección.
+        """
+        self._root.create_subsection(key)
+
     def has(self, key: str) -> bool:
         """
         Indica si los ajustes de configuración contienen una subsección

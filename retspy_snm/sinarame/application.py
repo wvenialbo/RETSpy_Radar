@@ -8,7 +8,7 @@ from ..base.exceptions import (
     TimeConversionError,
 )
 from ..base.logging import get_logger
-from ..base.utils import timing
+from ..base.utils import console, timing
 from .application_info import info
 from .robot_smn import RobotSMN
 from .settings_smn import SettingsSMN as Settings
@@ -32,47 +32,6 @@ class Application:
         self._logger: Logger = get_logger(info.name)
         self._settings: Settings = settings
 
-    def is_parent_process(self, module_name: str) -> bool:
-        """
-        Verifica el modo de ejecución.
-
-        Comprueba si el módulo que instanció la aplicación y arrancó el
-        sistema es el proceso padre.
-
-        Parameters
-        ----------
-        module_name : str
-            El nombre del módulo que instanció la aplicación y arrancó
-            el sistema.
-
-        Returns
-        -------
-        bool
-            `True` si el módulo es el proceso padre, `False` en caso
-            contrario.
-        """
-        return module_name == PARENT_PROCESS
-
-    def is_stand_alone(self, module_name: str) -> bool:
-        """
-        Verifica si se está ejecutando en modo independiente.
-
-        Comprueba si el módulo que instanció la aplicación y arrancó el
-        sistema es un módulo independiente.
-
-        Parameters
-        ----------
-        module_name : str
-            El nombre del módulo que instanció la aplicación y arrancó
-            el sistema.
-
-        Returns
-        -------
-        bool
-            `True` si el módulo es independiente, `False` en caso contrario.
-        """
-        return module_name in {PARENT_PROCESS, CHILD_PROCESS}
-
     def run(self, module_name: str) -> None:
         """
         Inicia la ejecución de la aplicación.
@@ -85,54 +44,76 @@ class Application:
         """
         # Mostrar el banner del programa
 
-        self.print_banner()
-
-        # Verificar que la aplicación no sea importada como módulo y
-        # que se ejecute como un programa independiente. Terminar la
-        # ejecución si no se cumple la condición
-
-        if not self.is_stand_alone(module_name):
-            # Registrar un mensaje de error, imprimir las directivas
-            # de operación y salir
-
-            self._logger.error(
-                "Se aborta la operación: la aplicación se "
-                "importó desde un proceso secundario."
-            )
-
-            print(f"Ejecuta `{info.name}` desde la línea de comando.")
-
-            return
+        self._print_banner()
 
         # Iniciar la ejecución del bot de indexación de datos
 
-        try:
-            args: dict[str, Any] = self._setup_arguments()
+        # Capturar las excepciones específicas y registrarlas en el
+        # registro de eventos. Finalizar la ejecución del sistema
+        # graciosa y ordenadamente
+        # --------------------------------------------------------------
 
-            robot = RobotSMN(self._settings, self._logger)
+        args: dict[str, Any] = self._setup_arguments()
 
-            robot.run(**args)
+        robot = RobotSMN(self._settings, self._logger)
 
-        # Capturar todas excepciones no manejadas específicamente y
-        # registrarlas en el registro de eventos. Finalizar la
-        # ejecución del sistema graciosa y ordenadamente
+        self._print_summary(args)
 
-        except Exception as exc:
-            self._logger.critical(
-                f"No se puede continuar: Error inesperado: {exc}"
-            )
+        while True:
+            try:
 
-            print("No se puede continuar: ocurrió un error inesperado.")
+                robot.run(**args)
 
-    def print_banner(self) -> None:
+                break
+
+            except KeyboardInterrupt as exc:
+                terminate: str = console.prompt(
+                    "¿Desea salir del programa?", console.YES_NO
+                )
+
+                if console.response_is(terminate, console.YES):
+                    raise exc
+
+        # --------------------------------------------------------------
+
+    def _print_banner(self) -> None:
         # Imprime el banner del programa
 
         print(f"{info.banner}\n")
 
-    def print_footer(self) -> None:
+    def _print_footer(self) -> None:
         # Imprime el pie de página del programa
 
         print(f"{info.version_full}\n")
+
+    def _print_summary(self, args: dict[str, Any]) -> None:
+        # Imprime el resumen de la ejecución del programa
+
+        start_time: datetime = args["start_time"]
+        end_time: datetime = args["end_time"]
+        scan_interval: timedelta = args["scan_interval"]
+        station_ids: list[str] = args["station_ids"]
+
+        begin: str = start_time.strftime("%Y-%m-%dT%H:%M:%S%z")
+        end: str = end_time.strftime("%Y-%m-%dT%H:%M:%S%z")
+
+        print("Resumen de la ejecución")
+        print("----------------------")
+        print(f"  - Fecha de inicio         : {begin}")
+        print(f"  - Fecha de finalización   : {end}")
+        print(f"  - Intervalo de escaneo    : {scan_interval}")
+        print(f"  - Estaciones a monitorear : {', '.join(station_ids)}\n")
+
+        stations: dict[str, dict[str, Any]] = self._settings.section(
+            "stations"
+        ).to_dict()
+
+        for station_id in station_ids:
+            if station_id in stations:
+                station: dict[str, Any] = stations[station_id]
+                print(f"Estación {station_id}: {station['name']}")
+                print(f"  - Latitud  : {station['lat']:+02.14f}")
+                print(f"  - Longitud : {station['lon']:+02.14f}\n")
 
     def _setup_arguments(self) -> dict[str, Any]:
         """
@@ -208,9 +189,28 @@ class Application:
 
         scan_interval = timedelta(seconds=self._settings.scan_interval)
 
+        station_ids: list[str] = list()
+
+        stations: dict[str, Any] = self._settings.section("stations").to_dict()
+        groups: dict[str, list[str]] = self._settings.value(
+            "station_groups"
+        ).as_type(dict[str, list[str]])
+
+        for station_id in self._settings.station_ids:
+            if station_id in stations:
+                station_ids.append(station_id)
+            elif station_id in groups:
+                station_ids.extend(groups[station_id])
+            else:
+                station_ids.append(station_id)
+                self._logger.warning(
+                    f"La estación '{station_id}' no está definida en la "
+                    "configuración de la aplicación."
+                )
+
         return {
             "start_time": start_time,
             "end_time": end_time,
             "scan_interval": scan_interval,
-            "station_ids": self._settings.station_ids,
+            "station_ids": station_ids,
         }
