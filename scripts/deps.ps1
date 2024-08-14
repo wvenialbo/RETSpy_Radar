@@ -1,8 +1,4 @@
-# Development time packages:
-# pip install -U build
-# pip install -U findpydeps
-# pip install -U jupyterlab # for prototyping
-# pip install -U wheel
+# Extract requirements from source code and create `requirements.txt`
 
 & ./.venv/Scripts/Activate.ps1
 
