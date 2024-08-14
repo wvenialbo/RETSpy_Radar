@@ -1,0 +1,200 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "retspy_smn --version",
+            "args": [
+                "--version",
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "module": "retspy_smn",
+            "request": "launch",
+            "type": "debugpy",
+            "env": {
+                "PROJECT_PATH": "${workspaceFolder}",
+                "PROJECT_FOLDER": "${workspaceFolderBasename}",
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYDEVD_DISABLE_FILE_VALIDATION": "1",
+            },
+            "justMyCode": true,
+            "pythonArgs": [
+                "-Xfrozen_modules=off",
+            ],
+        },
+        {
+            "name": "retspy_smn --help",
+            "args": [
+                "--help",
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "module": "retspy_smn",
+            "request": "launch",
+            "type": "debugpy",
+            "env": {
+                "PROJECT_PATH": "${workspaceFolder}",
+                "PROJECT_FOLDER": "${workspaceFolderBasename}",
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYDEVD_DISABLE_FILE_VALIDATION": "1",
+            },
+            "justMyCode": true,
+            "pythonArgs": [
+                "-Xfrozen_modules=off",
+            ],
+        },
+        {
+            "name": "retspy_smn init --version",
+            "args": [
+                "init",
+                "--version",
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "module": "retspy_smn",
+            "request": "launch",
+            "type": "debugpy",
+            "env": {
+                "PROJECT_PATH": "${workspaceFolder}",
+                "PROJECT_FOLDER": "${workspaceFolderBasename}",
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYDEVD_DISABLE_FILE_VALIDATION": "1",
+            },
+            "justMyCode": true,
+            "pythonArgs": [
+                "-Xfrozen_modules=off",
+            ],
+        },
+        {
+            "name": "retspy_smn init --help",
+            "args": [
+                "init",
+                "--help",
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "module": "retspy_smn",
+            "request": "launch",
+            "type": "debugpy",
+            "env": {
+                "PROJECT_PATH": "${workspaceFolder}",
+                "PROJECT_FOLDER": "${workspaceFolderBasename}",
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYDEVD_DISABLE_FILE_VALIDATION": "1",
+            },
+            "justMyCode": true,
+            "pythonArgs": [
+                "-Xfrozen_modules=off",
+            ],
+        },
+        {
+            "name": "retspy_smn [default]",
+            "args": [
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "module": "retspy_smn",
+            "request": "launch",
+            "type": "debugpy",
+            "env": {
+                "PROJECT_PATH": "${workspaceFolder}",
+                "PROJECT_FOLDER": "${workspaceFolderBasename}",
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYDEVD_DISABLE_FILE_VALIDATION": "1",
+            },
+            "justMyCode": true,
+            "pythonArgs": [
+                "-Xfrozen_modules=off",
+            ],
+        },
+        {
+            "name": "retspy_smn -v",
+            "args": [
+                "-v",
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "module": "retspy_smn",
+            "request": "launch",
+            "type": "debugpy",
+            "env": {
+                "PROJECT_PATH": "${workspaceFolder}",
+                "PROJECT_FOLDER": "${workspaceFolderBasename}",
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYDEVD_DISABLE_FILE_VALIDATION": "1",
+            },
+            "justMyCode": true,
+            "pythonArgs": [
+                "-Xfrozen_modules=off",
+            ],
+        },
+        {
+            "name": "retspy_smn -h",
+            "args": [
+                "-h",
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "module": "${workspaceFolderBasename}.retspy_smn",
+            "request": "launch",
+            "type": "debugpy",
+            "env": {
+                "PROJECT_PATH": "${workspaceFolder}",
+                "PROJECT_FOLDER": "${workspaceFolderBasename}",
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYDEVD_DISABLE_FILE_VALIDATION": "1",
+            },
+            "justMyCode": true,
+            "pythonArgs": [
+                "-Xfrozen_modules=off",
+            ],
+        },
+        {
+            "name": "retspy_smn init -v",
+            "args": [
+                "init",
+                "-v",
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "module": "${workspaceFolderBasename}.retspy_smn",
+            "request": "launch",
+            "type": "debugpy",
+            "env": {
+                "PROJECT_PATH": "${workspaceFolder}",
+                "PROJECT_FOLDER": "${workspaceFolderBasename}",
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYDEVD_DISABLE_FILE_VALIDATION": "1",
+            },
+            "justMyCode": true,
+            "pythonArgs": [
+                "-Xfrozen_modules=off",
+            ],
+        },
+        {
+            "name": "retspy_smn init -h",
+            "args": [
+                "init",
+                "-h",
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "module": "${workspaceFolderBasename}.retspy_smn",
+            "request": "launch",
+            "type": "debugpy",
+            "env": {
+                "PROJECT_PATH": "${workspaceFolder}",
+                "PROJECT_FOLDER": "${workspaceFolderBasename}",
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYDEVD_DISABLE_FILE_VALIDATION": "1",
+            },
+            "justMyCode": true,
+            "pythonArgs": [
+                "-Xfrozen_modules=off",
+            ],
+        },
+     ],
+}

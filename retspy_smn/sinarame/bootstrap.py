@@ -8,7 +8,7 @@ from ..base.exceptions import (
 )
 from ..base.settings import Section
 from ..base.utils import console
-from .application_info import info
+from .application_info import app_info
 from .cli_parser import CLINamespace, Parser
 from .settings_smn import SettingsSMN as Settings
 
@@ -66,7 +66,10 @@ class Bootstrap:
                 "El archivo de configuración no existe o no es el correcto"
             )
 
-        if self._settings.value("model").as_type(str) != info.settings_model:
+        if (
+            self._settings.value("model").as_type(str)
+            != app_info.settings_model
+        ):
             raise UninitializedWorkspaceError(
                 "El archivo de configuración no es el correcto"
             )
@@ -77,7 +80,7 @@ class Bootstrap:
         # afirmativo se sobrescribirá con los valores predeterminados
 
         user_settings_path: str = namespace.config_path or path.join(
-            self._settings.current_dir, info.user_settings
+            self._settings.current_dir, app_info.user_settings
         )
 
         if path.exists(user_settings_path):
@@ -94,7 +97,7 @@ class Bootstrap:
         # de trabajo del usuario
 
         default_settings_path: str = path.join(
-            self._settings.install_dir, info.default_settings
+            self._settings.install_dir, app_info.default_settings
         )
 
         if not path.exists(default_settings_path):

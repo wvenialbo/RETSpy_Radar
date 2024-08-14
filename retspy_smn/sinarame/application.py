@@ -9,7 +9,7 @@ from ..base.exceptions import (
 )
 from ..base.logging import get_logger
 from ..base.utils import console, timing
-from .application_info import info
+from .application_info import pkg_info
 from .robot_smn import RobotSMN
 from .settings_smn import SettingsSMN as Settings
 
@@ -29,7 +29,7 @@ class Application:
         logger : Logger
             El registro de eventos de la aplicación.
         """
-        self._logger: Logger = get_logger(info.name)
+        self._logger: Logger = get_logger(pkg_info.name)
         self._settings: Settings = settings
 
     def run(self, module_name: str) -> None:
@@ -81,12 +81,12 @@ class Application:
     def _print_banner(self) -> None:
         # Imprime el banner del programa
 
-        print(f"{info.banner}\n")
+        print(f"{pkg_info.banner}\n")
 
     def _print_footer(self) -> None:
         # Imprime el pie de página del programa
 
-        print(f"{info.version_full}\n")
+        print(f"{pkg_info.version_full}\n")
 
     def _print_summary(self, args: dict[str, Any]) -> None:
         # Imprime el resumen de la ejecución del programa

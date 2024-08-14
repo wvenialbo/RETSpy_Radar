@@ -1,7 +1,7 @@
 import os
 from os import path
 
-from .application_info import info
+from .application_info import app_info
 from .settings_smn import SettingsSMN as Settings
 
 
@@ -18,7 +18,9 @@ class Startup:
         current_dir: str = os.getcwd()
 
         # Cargar la configuración del usuario
-        user_settings_path: str = path.join(current_dir, info.user_settings)
+        user_settings_path: str = path.join(
+            current_dir, app_info.user_settings
+        )
 
         settings: Settings = Settings.load(
             user_settings_path, fail_if_not_exists=False

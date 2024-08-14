@@ -7,17 +7,14 @@ Si no se proveen argumentos, se utilizarán los valores por defecto. Para
 más información, ejecute el script con la opción -h o --help.
 """
 
-from logging import Logger
-
 from .base.exceptions import (
     InvalidConfigurationFileError,
     UninitializedOutputDirError,
     UninitializedWorkspaceError,
 )
-from .base.logging.logger import get_logger
-from .sinarame import Application, ApplicationInfo, Bootstrap
-from .sinarame import SettingsSMN as Settings
-from .sinarame import Startup
+from .base.logging.logger import Logger, get_logger
+from .package_info import pkg_info
+from .sinarame import Application, Bootstrap, SettingsSMN, Startup
 
 
 def main() -> None:
@@ -27,11 +24,11 @@ def main() -> None:
     Ejecuta los procesos de inicio y arranque de la aplicación, y
     posteriormente inicia la aplicación.
     """
-    logger: Logger = get_logger(ApplicationInfo.name)
+    logger: Logger = get_logger(pkg_info.name)
 
     try:
         startup_routines = Startup(__file__)
-        settings: Settings = startup_routines.run()
+        settings: SettingsSMN = startup_routines.run()
 
         bootstrap_routines = Bootstrap(settings)
         settings = bootstrap_routines.run()
@@ -51,7 +48,7 @@ def main() -> None:
     except UninitializedWorkspaceError as exc:
         logger.error(f"El espacio de trabajo no se ha inicializado: {exc}")
         logger.info(
-            f"Ejecuta el comando '{ApplicationInfo.name} init' "
+            f"Ejecuta el comando '{pkg_info.name} init' "
             "para inicializar el espacio de trabajo."
         )
 

@@ -1,7 +1,7 @@
 from argparse import SUPPRESS, ArgumentParser, Namespace
 from typing import Any, Sequence
 
-from .application_info import info
+from .application_info import app_info, pkg_info
 
 
 class CustomArgumentParser(ArgumentParser):
@@ -29,10 +29,9 @@ class CustomArgumentParser(ArgumentParser):
     @classmethod
     def get_parser(cls) -> "CustomArgumentParser":
         parser = CustomArgumentParser(
-            prog=info.name,
-            description=f"{info.lemma}:\n\n{info.description}",
-            epilog="Hecho por el equipo de desarrollo de RETSPy.\n"
-            "Copyright (C) 2024.",
+            prog=pkg_info.name,
+            description=app_info.detail,
+            epilog=app_info.copyright,
             add_help=False,
         )
 
@@ -40,7 +39,7 @@ class CustomArgumentParser(ArgumentParser):
             "-v",
             "--version",
             action="version",
-            version=f"%(prog)s {info.version_short}",
+            version=f"%(prog)s {pkg_info.version}",
             help="Muestra la versión del programa y termina.",
         )
 
@@ -139,19 +138,17 @@ class CustomArgumentParser(ArgumentParser):
 
         init_parser = subparser.add_parser(
             "init",
-            prog=info.name,
-            description=f"{info.lemma}:\n\n{info.description}",
-            epilog="Hecho por el equipo de desarrollo de RETSPy.\n"
-            "Copyright (C) 2024.",
+            prog=f"{pkg_info.name} init",
+            description=app_info.detail,
+            epilog=app_info.copyright,
             add_help=False,
-            usage="%(prog)s init [opciones]",
         )
 
         init_parser.add_argument(
             "-v",
             "--version",
             action="version",
-            version=f"%(prog)s {info.version_short}",
+            version=f"{pkg_info.name} {pkg_info.version}",
             help="Muestra la versión del programa y termina.",
         )
 

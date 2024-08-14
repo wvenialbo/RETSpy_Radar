@@ -1,0 +1,223 @@
+{
+	// Place snippets for python here. Each snippet is defined under a snippet
+	// name and has a scope, prefix, body and description. Add comma separated
+	// ids of the languages where the snippet is applicable in the scope field.
+	// If scope is left empty or omitted, the snippet gets applied to all
+	// languages. The prefix is what is used to trigger the snippet and the body
+	// will be expanded and inserted. Possible variables are: $1, $2 for tab
+	// stops, $0 for the final cursor position, and ${1:label}, ${2:another} for
+	// placeholders. Placeholders with the same ids are connected. Example:
+	// "Print to console": { "scope": "javascript,typescript", "prefix": "log",
+	// "body": [ "console.log('$1');", "$2"
+	//  ],
+	//  "description": "Log output to console"
+	// }
+	"Import alias": {
+		"prefix": [
+			"import-alias"
+		],
+		"body": [
+			"${1:name} as ${1:name}",
+		],
+		"description": "Aliased import.",
+		"scope": "python",
+	},
+	"Class property (modifiable)": {
+		"prefix": [
+			"clprop-get-set"
+		],
+		"body": [
+			"@property",
+			"def ${1:name}(self) -> ${2:type}:",
+			"    \"\"\"${3:docstring}\"\"\"",
+			"    return self._${1:name}\n",
+			"@${1:name}.setter",
+			"def ${1:name}(self, ${4:value}: ${2:type}) -> None:",
+			"    self._${1:name} = ${4:value}$0\n",
+		],
+		"description": "A modifiable class property.",
+		"scope": "python",
+	},
+	"Class property (readable)": {
+		"prefix": [
+			"clprop-get"
+		],
+		"body": [
+			"@property",
+			"def ${1:name}(self) -> ${2:type}:",
+			"    \"\"\"${3:docstring}\"\"\"",
+			"    return self._${1:name}$0\n",
+		],
+		"description": "A read-only class property.",
+		"scope": "python",
+	},
+	"Class property (writeable)": {
+		"prefix": [
+			"clprop-set"
+		],
+		"body": [
+			"def set_${1:name}(self, ${2:value}: ${3:type}) -> None:",
+			"    self._${1:name} = ${2:value}\n",
+			"${1:name} = property(fset=set_${1:name},",
+			"                     doc=\"${4:docstring}\"",
+			"                     )$0"
+		],
+		"description": "A write-only class property.",
+		"scope": "python",
+	},
+	"Mapped class property (modifiable)": {
+		"prefix": [
+			"clprop-get-set-map"
+		],
+		"body": [
+			"def get_${1:name}(self) -> ${2:type}:",
+			"    return self['${1:name}']\n",
+			"def set_${1:name}(self, ${3:value}: ${2:type}) -> None:",
+			"    self['${1:name}'] = ${3:value}\n",
+			"${1:name} = property(fget=get_${1:name},",
+			"                     fset=set_${1:name},",
+			"                     doc=\"${4:docstring}\"",
+			"                     )$0"
+		],
+		"description": "A modifiable class property.",
+		"scope": "python",
+	},
+	"Mapped class property (readable)": {
+		"prefix": [
+			"clprop-get-map"
+		],
+		"body": [
+			"def get_${1:name}(self) -> ${2:type}:",
+			"    return self['${1:name}']\n",
+			"${1:name} = property(fget=get_${1:name},",
+			"                     doc=\"${3:docstring}\"",
+			"                     )$0"
+		],
+		"description": "A read-only class property.",
+		"scope": "python",
+	},
+	"Mapped class property (writeable)": {
+		"prefix": [
+			"clprop-set-map"
+		],
+		"body": [
+			"def set_${1:name}(self, ${2:value}: ${3:type}) -> None:",
+			"    self['${1:name}'] = ${2:value}\n",
+			"${1:name} = property(fset=set_${1:name},",
+			"                     doc=\"${4:docstring}\"",
+			"                     )$0"
+		],
+		"description": "A write-only class property.",
+		"scope": "python",
+	},
+	"Class method (abstract)": {
+		"prefix": [
+			"clmet-abstract"
+		],
+		"body": [
+			"@abstractmethod",
+			"def ${1:name}(self, ${2:value}: ${3:type}) -> ${4:return-type}:",
+			"    return ${4:return-type}(None)$0\n"
+		],
+		"description": "An abstract method.",
+		"scope": "python",
+	},
+	"Class method (concrete)": {
+		"prefix": [
+			"clmet-concrete"
+		],
+		"body": [
+			"def ${1:name}(self, ${2:value}: ${3:type}) -> ${4:return-type}:",
+			"    return ${4:return-type}(None)$0\n"
+		],
+		"description": "A concrete method.",
+		"scope": "python",
+	},
+	"Class method (class)": {
+		"prefix": [
+			"clmet-class"
+		],
+		"body": [
+			"@classmethod",
+			"def ${1:name}(cls, ${2:value}: ${3:type}) -> ${4:return-type}:",
+			"    return ${4:return-type}(None)$0\n"
+		],
+		"description": "An abstract method.",
+		"scope": "python",
+	},
+	"Class method (static)": {
+		"prefix": [
+			"clmet-static"
+		],
+		"body": [
+			"@staticmethod",
+			"def ${1:name}(${2:value}: ${3:type}) -> ${4:return-type}:",
+			"    return ${4:return-type}(None)$0\n"
+		],
+		"description": "A static method.",
+		"scope": "python",
+	},
+	"Class method (static+abstract)": {
+		"prefix": [
+			"clmet-static-abstract"
+		],
+		"body": [
+			"@staticmethod",
+			"@abstractmethod",
+			"def ${1:name}(${2:value}: ${3:type}) -> ${4:return-type}:",
+			"    return ${4:return-type}(None)$0\n"
+		],
+		"description": "A static method.",
+		"scope": "python",
+	},
+	"OpenCV Moments (central)": {
+		"prefix": [
+			"cvmoment-mu"
+		],
+		"body": [
+			"mu${1:00} = ${2:moments}['mu${1:00}']$0",
+		],
+		"description": "OpenCV central moments.",
+		"scope": "python",
+	},
+	"OpenCV Moments (normalised)": {
+		"prefix": [
+			"cvmoment-nu"
+		],
+		"body": [
+			"nu${1:00} = ${2:moments}['nu${1:00}']$0",
+		],
+		"description": "OpenCV normalised moments.",
+		"scope": "python",
+	},
+	"OpenCV Moments (raw)": {
+		"prefix": [
+			"cvmoment-m"
+		],
+		"body": [
+			"m${1:00} = ${2:moments}['m${1:00}']$0",
+		],
+		"description": "OpenCV raw moments.",
+		"scope": "python",
+	},
+	"Equation-Katex": {
+		"prefix": "md-equ",
+		"body": [
+			"$$\\begin{equation}",
+			"$0",
+			"\\end{equation}$$",
+		],
+		"description": "Katex equation environment",
+		"scope": "markdown"
+	},
+	"Align-Katex": {
+		"prefix": "md-align",
+		"body": [
+			"$$\\begin{align}",
+			"$0",
+			"\\end{align}$$",
+		],
+		"description": "Katex align environment",
+		"scope": "markdown"
+	}
+}
