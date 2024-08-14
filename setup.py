@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 from setuptools import find_namespace_packages, setup
 
@@ -20,6 +21,12 @@ EXCLUDE: tuple[str, ...] = (
     "tutorial",
 )
 
-setup(packages=find_namespace_packages(exclude=EXCLUDE), **vars(pkg_info()))
+args: dict[str, Any] = {
+    k: v
+    for k, v in pkg_info.__dict__.items()
+    if not (k.startswith("__") and k.endswith("__"))
+}
+
+setup(packages=find_namespace_packages(exclude=EXCLUDE), **args)
 
 pkg_info.long_description = long_description

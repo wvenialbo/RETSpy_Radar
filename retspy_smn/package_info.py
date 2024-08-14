@@ -13,9 +13,7 @@ class PackageInfo:
 
     long_description_content_type: str = "text/markdown"
 
-    package_data: dict[str, list[str]] = {
-        "retspy_smn": ["retspy_smn/settings.json"]
-    }
+    package_data: dict[str, list[str]] = {"retspy_smn": ["settings.json"]}
 
     include_package_data: bool = True
 
