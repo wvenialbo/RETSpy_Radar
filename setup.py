@@ -11,15 +11,23 @@ long_description: str = pkg_info.long_description
 
 pkg_info.long_description = (this_directory / long_description).read_text()
 
-EXCLUDE: tuple[str, ...] = (
-    "build",
-    "dist",
-    "docs",
-    "examples",
-    "scripts",
-    "tests",
-    "tutorial",
-)
+EXCLUDE: list[str] = [
+    item
+    for sublist in [
+        (f"{excluding}.*", excluding)
+        for excluding in (
+            "__pycache__",
+            "build",
+            "dist",
+            "docs",
+            "examples",
+            "scripts",
+            "tests",
+            "tutorial",
+        )
+    ]
+    for item in sublist
+]
 
 args: dict[str, Any] = {
     k: v
@@ -27,6 +35,9 @@ args: dict[str, Any] = {
     if not (k.startswith("__") and k.endswith("__"))
 }
 
-setup(packages=find_namespace_packages(exclude=EXCLUDE), **args)
+setup(
+    packages=find_namespace_packages(exclude=EXCLUDE),
+    **args,
+)
 
 pkg_info.long_description = long_description

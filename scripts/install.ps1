@@ -1,27 +1,33 @@
-# Create a virtual environment
+##
+## Install and initialize the development environment
+##
 
-python -m venv .venv
+# Create a virtual environment, if not exists
+
+$venv = '.venv'
+
+If (-not (Test-Path -Path $venv)) {
+    python -m venv $venv
+}
 
 # Activate the environment
 
 & ./.venv/Scripts/Activate.ps1
 
-# Install development time packages
+# Install development time packages, if any
 
-pip install -U build
+$packages = 'build', 'findpydeps', 'wheel', 'jupyterlab' # for prototyping
 
-pip install -U findpydeps
+Foreach ($package in $packages) {
+    pip install $package --upgrade
+}
 
-pip install -U jupyterlab # for prototyping
-
-pip install -U wheel
-
-# Install requirements if any
+# Install requirements, if any
 
 $files = 'requirements.txt', 'requirements-dev.txt'
 
 Foreach ($file in $files) {
-    If (Test-Path $file) {
-        pip install -r $file
+    If (Test-Path -Path $file) {
+        pip install -r $file --upgrade
     }
 }
