@@ -3,7 +3,7 @@ from typing import Any
 
 from setuptools import find_namespace_packages, setup
 
-from retspy_smn.package_info import pkg_info
+from retspy_radar.package_info import pkg_info
 
 this_directory: Path = Path(__file__).parent
 
