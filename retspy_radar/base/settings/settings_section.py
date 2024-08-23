@@ -66,7 +66,7 @@ class SettingsSection(ABC):
         """
 
     @abstractmethod
-    def section(self, key: str) -> "Section":
+    def section(self, key: str) -> "SettingsSection":
         """
         Obtiene una subsección de ajustes de configuración.
 
@@ -96,6 +96,3 @@ class SettingsSection(ABC):
         Value
             El valor de ajuste de configuración.
         """
-
-
-Section = SettingsSection
