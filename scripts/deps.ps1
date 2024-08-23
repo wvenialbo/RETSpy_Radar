@@ -38,17 +38,15 @@ $required = $required -replace 'sklearn', 'scikit-learn'
 
 # Create two empty arrays for 'requirements.txt' and 'requirements-dev.txt'
 
-$requirements = 'requirements.txt'
 $required_prod = @()
 
-$requirements_dev = 'requirements-dev.txt'
 $required_dev = @()
 
 # Loop through each line in 'installed.txt'
 
 foreach ($line in $installed) {
 
-    # Extract the package name
+    # Split the package name from the version string
 
     $packageName = $line.Split('==')[0]
 
@@ -58,25 +56,28 @@ foreach ($line in $installed) {
 
         # Add to 'requirements.txt'
 
-        $required_prod += $line
+        $required_prod += $line + "`n"
 
-    } else {
+    }
+    else {
 
         # Add to 'requirements-dev.txt'
 
-        $required_dev += $line
+        $required_dev += $line + "`n"
+
     }
 }
 
-# Write the results to separate text files
+# Write the results to separate text files:
+#
+# Replace '==' with '~=' for backward-compatibility in 'requirements.txt'
+#           or with '>=' for forward compatibility in 'requirements-dev.txt'
 
-$required_prod | Set-Content -Path $requirements
-$required_dev | Set-Content -Path $requirements_dev
+$requirements = 'requirements.txt'
+$requirements_dev = 'requirements-dev.txt'
 
-# Replace '==' with '>=' for forward compatibility
-
-(Get-Content $requirements).Replace('==', '>=') | Set-Content $requirements
-(Get-Content $requirements_dev).Replace('==', '>=') | Set-Content $requirements_dev
+$required_prod.Replace('==', '~=') | Set-Content -NoNewline -Path $requirements
+$required_dev.Replace('==', '>=') | Set-Content -NoNewline -Path $requirements_dev
 
 # Clean up auxiliary files
 
