@@ -5,6 +5,7 @@ from typing import Any
 from ..exceptions import InvalidConfigurationFileError, NotAFileError
 from ..utils.filesystem import filesystem
 from .settings_section import SettingsSection
+from .settings_section import SettingsSection as _Section
 from .settings_section_adapter import Section
 from .settings_value_adapter import Value
 
@@ -51,7 +52,7 @@ class SettingsBase(SettingsSection):
         self._root = Section(settings)
 
     def add_subsection(
-        self, key: str, section: "Section | dict[str, Any]"
+        self, key: str, section: "_Section | dict[str, Any]"
     ) -> None:
         """
         Agrega una subsección a la sección de ajustes de configuración.
@@ -65,8 +66,11 @@ class SettingsBase(SettingsSection):
 
         Raises
         ------
-        ValueError
+        KeyError
             Si la clave ya existe en la sección.
+        ValueError
+            Si la sección de ajustes de configuración no es válida o
+            contiene valores de ajuste de configuración no válidos.
         """
         self._root.add_subsection(key, section)
 
@@ -83,9 +87,10 @@ class SettingsBase(SettingsSection):
 
         Raises
         ------
+        KeyError
+            Si la clave ya existe en la sección.
         ValueError
-            Si la clave ya existe en la sección o si el valor es un
-            diccionario.
+            Si el valor de ajuste de configuración es inválido.
         """
         self._root.add_value(key, value)
 
@@ -100,7 +105,7 @@ class SettingsBase(SettingsSection):
 
         Raises
         ------
-        ValueError
+        KeyError
             Si la clave ya existe en la sección.
         """
         self._root.create_subsection(key)
@@ -136,7 +141,7 @@ class SettingsBase(SettingsSection):
         """
         return self._root.is_empty()
 
-    def section(self, key: str) -> "Section":
+    def section(self, key: str, copy: bool = False) -> "Section":
         """
         Obtiene una subsección de ajustes de configuración.
 
@@ -144,13 +149,56 @@ class SettingsBase(SettingsSection):
         ----------
         key : str
             La clave de la subsección de ajustes de configuración.
+        copy : bool, optional
+            Indica si se debe devolver una copia de la subsección.
+            Por defecto es `False`.
 
         Returns
         -------
         Section
             La subsección de ajustes de configuración.
         """
-        return self._root.section(key)
+        return self._root.section(key, copy)
+
+    def to_dict(self, copy: bool = False) -> dict[str, Any]:
+        """
+        Obtiene la sección de ajustes como un diccionario.
+
+        Convierte la sección de ajustes de configuración en un
+        diccionario.
+
+        Parameters
+        ----------
+        copy : bool, optional
+            Indica si se debe devolver una copia de la subsección.
+            Por defecto es `False`.
+
+        Returns
+        -------
+        dict[str, Any]
+            La sección de ajustes de configuración como un diccionario.
+        """
+        return self._root.to_dict(copy)
+
+    def update(self, section: "_Section | dict[str, Any]") -> None:
+        """
+        Actualiza la sección de ajustes de configuración.
+
+        Parameters
+        ----------
+        section : SettingsSection | dict[str, Any]
+            Un diccionario con los ajustes de configuración.
+
+        Raises
+        ------
+        ValueError
+            Si la sección de ajustes de configuración no es válida o
+            contiene valores de ajuste de configuración no válidos.
+        TypeError
+            Si el objeto no corresponde a una sección de ajustes de
+            configuración.
+        """
+        return self._root.update(section)
 
     def value(self, key: str) -> Value:
         """
@@ -165,6 +213,14 @@ class SettingsBase(SettingsSection):
         -------
         Value
             El valor de ajuste de configuración.
+
+        Raises
+        ------
+        KeyError
+            Si la clave no existe en la sección.
+        TypeError
+            Si la clave no corresponde a un valor de ajuste de
+            configuración.
         """
         return self._root.value(key)
 

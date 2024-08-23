@@ -1,3 +1,4 @@
+import json
 from typing import Any, Type, TypeVar
 
 T = TypeVar("T")
@@ -31,7 +32,7 @@ class SettingsValueAdapter:
         value : Any
             El valor de ajuste de configuración.
         """
-        self._value: Any = value
+        self._value: Any = self._get_valid_value(value)
 
     def __bool__(self) -> bool:
         """
@@ -43,7 +44,7 @@ class SettingsValueAdapter:
             `True` si el valor de ajuste de configuración no está
             vacío, `False` en caso contrario.
         """
-        return bool(self._value) if self._value is not None else False
+        return bool(self._value)
 
     def __str__(self) -> str:
         """
@@ -56,7 +57,18 @@ class SettingsValueAdapter:
             La representación en cadena del valor de ajuste de
             configuración.
         """
-        return str(self._value) if self._value is not None else ""
+        return str(self._value)
+
+    def as_raw(self) -> Any:
+        """
+        Obtiene el valor de ajuste de configuración sin convertir.
+
+        Returns
+        -------
+        Any
+            El valor de ajuste de configuración sin convertir.
+        """
+        return self._value
 
     def as_type(self, type_: Type[T]) -> T:
         """
@@ -87,6 +99,58 @@ class SettingsValueAdapter:
             raise ValueError(
                 f"No se pudo convertir el valor a {type_.__name__}: {exc}"
             ) from exc
+
+    @staticmethod
+    def _get_valid_value(value: Any) -> Any:
+        """
+        Obtiene un valor de ajuste de configuración válido.
+
+        Parameters
+        ----------
+        value : Any
+            El valor de ajuste de configuración a validar.
+
+        Returns
+        -------
+        Any
+            El valor de ajuste de configuración validado.
+
+        Raises
+        ------
+        ValueError
+            Si el valor de ajuste de configuración no es válido.
+        """
+        # No permitir valores de tipo diccionario; los diccionarios
+        # representan secciones de ajustes de configuración.
+
+        if isinstance(value, dict):
+            raise ValueError(
+                "El valor de ajuste de configuración "
+                "no puede ser un diccionario"
+            )
+
+        # No permitir valores `None`; los valores vacíos deben ser
+        # explícitos.
+
+        if value is None:
+            raise ValueError(
+                "El valor de ajuste de configuración no puede ser nulo"
+            )
+
+        # Validar el valor de ajuste de configuración antes de
+        # asimilarlo.
+
+        try:
+            dummy_section: dict[str, Any] = {"dummy_value": value}
+
+            assert json.dumps(dummy_section)
+
+        except TypeError as exc:
+            raise ValueError(
+                "El valor de ajuste de configuración no es válido"
+            ) from exc
+
+        return value
 
 
 Value = SettingsValueAdapter
