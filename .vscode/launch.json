@@ -5,13 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "retspy_smn --version",
+            "name": "retspy_radar --version",
             "args": [
                 "--version",
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
-            "module": "retspy_smn",
+            "module": "retspy_radar",
             "request": "launch",
             "type": "debugpy",
             "env": {
@@ -26,13 +26,13 @@
             ],
         },
         {
-            "name": "retspy_smn --help",
+            "name": "retspy_radar --help",
             "args": [
                 "--help",
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
-            "module": "retspy_smn",
+            "module": "retspy_radar",
             "request": "launch",
             "type": "debugpy",
             "env": {
@@ -47,14 +47,14 @@
             ],
         },
         {
-            "name": "retspy_smn init --version",
+            "name": "retspy_radar init --version",
             "args": [
                 "init",
                 "--version",
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
-            "module": "retspy_smn",
+            "module": "retspy_radar",
             "request": "launch",
             "type": "debugpy",
             "env": {
@@ -69,14 +69,14 @@
             ],
         },
         {
-            "name": "retspy_smn init --help",
+            "name": "retspy_radar init --help",
             "args": [
                 "init",
                 "--help",
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
-            "module": "retspy_smn",
+            "module": "retspy_radar",
             "request": "launch",
             "type": "debugpy",
             "env": {
@@ -91,12 +91,12 @@
             ],
         },
         {
-            "name": "retspy_smn [default]",
+            "name": "retspy_radar [default]",
             "args": [
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
-            "module": "retspy_smn",
+            "module": "retspy_radar",
             "request": "launch",
             "type": "debugpy",
             "env": {
@@ -111,13 +111,13 @@
             ],
         },
         {
-            "name": "retspy_smn -v",
+            "name": "retspy_radar -v",
             "args": [
                 "-v",
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
-            "module": "retspy_smn",
+            "module": "retspy_radar",
             "request": "launch",
             "type": "debugpy",
             "env": {
@@ -132,13 +132,13 @@
             ],
         },
         {
-            "name": "retspy_smn -h",
+            "name": "retspy_radar -h",
             "args": [
                 "-h",
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
-            "module": "${workspaceFolderBasename}.retspy_smn",
+            "module": "${workspaceFolderBasename}.retspy_radar",
             "request": "launch",
             "type": "debugpy",
             "env": {
@@ -153,14 +153,14 @@
             ],
         },
         {
-            "name": "retspy_smn init -v",
+            "name": "retspy_radar init -v",
             "args": [
                 "init",
                 "-v",
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
-            "module": "${workspaceFolderBasename}.retspy_smn",
+            "module": "${workspaceFolderBasename}.retspy_radar",
             "request": "launch",
             "type": "debugpy",
             "env": {
@@ -175,14 +175,14 @@
             ],
         },
         {
-            "name": "retspy_smn init -h",
+            "name": "retspy_radar init -h",
             "args": [
                 "init",
                 "-h",
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
-            "module": "${workspaceFolderBasename}.retspy_smn",
+            "module": "${workspaceFolderBasename}.retspy_radar",
             "request": "launch",
             "type": "debugpy",
             "env": {
