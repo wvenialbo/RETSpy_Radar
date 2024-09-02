@@ -5,8 +5,9 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "retspy_radar [default]",
+            "name": "retspy_radar sinarame",
             "args": [
+                "sinarame",
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
@@ -25,52 +26,55 @@
             ],
         },
         {
-            "name": "retspy_radar --version",
-            "args": [
-                "--version",
-            ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "module": "retspy_radar",
-            "request": "launch",
-            "type": "debugpy",
-            "env": {
-                "PROJECT_PATH": "${workspaceFolder}",
-                "PROJECT_FOLDER": "${workspaceFolderBasename}",
-                "PYTHONPATH": "${workspaceFolder}",
-                "PYDEVD_DISABLE_FILE_VALIDATION": "1",
-            },
-            "justMyCode": true,
-            "pythonArgs": [
-                "-Xfrozen_modules=off",
-            ],
-        },
-        {
-            "name": "retspy_radar --help",
-            "args": [
-                "--help",
-            ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "module": "retspy_radar",
-            "request": "launch",
-            "type": "debugpy",
-            "env": {
-                "PROJECT_PATH": "${workspaceFolder}",
-                "PROJECT_FOLDER": "${workspaceFolderBasename}",
-                "PYTHONPATH": "${workspaceFolder}",
-                "PYDEVD_DISABLE_FILE_VALIDATION": "1",
-            },
-            "justMyCode": true,
-            "pythonArgs": [
-                "-Xfrozen_modules=off",
-            ],
-        },
-        {
-            "name": "retspy_radar init --help",
+            "name": "retspy_radar init -c <...>",
             "args": [
                 "init",
-                "--help",
+                "-c",
+                "./my_test/my.config.json",
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "module": "retspy_radar",
+            "request": "launch",
+            "type": "debugpy",
+            "env": {
+                "PROJECT_PATH": "${workspaceFolder}",
+                "PROJECT_FOLDER": "${workspaceFolderBasename}",
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYDEVD_DISABLE_FILE_VALIDATION": "1",
+            },
+            "justMyCode": true,
+            "pythonArgs": [
+                "-Xfrozen_modules=off",
+            ],
+        },
+        {
+            "name": "retspy_radar init --config-path <...>",
+            "args": [
+                "init",
+                "--config-path",
+                "./my.config.json",
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "module": "retspy_radar",
+            "request": "launch",
+            "type": "debugpy",
+            "env": {
+                "PROJECT_PATH": "${workspaceFolder}",
+                "PROJECT_FOLDER": "${workspaceFolderBasename}",
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYDEVD_DISABLE_FILE_VALIDATION": "1",
+            },
+            "justMyCode": true,
+            "pythonArgs": [
+                "-Xfrozen_modules=off",
+            ],
+        },
+        {
+            "name": "retspy_radar init",
+            "args": [
+                "init",
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
@@ -133,9 +137,32 @@
             ],
         },
         {
-            "name": "retspy_radar -v",
+            "name": "retspy_radar init -h",
             "args": [
-                "-v",
+                "init",
+                "-h",
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "module": "retspy_radar",
+            "request": "launch",
+            "type": "debugpy",
+            "env": {
+                "PROJECT_PATH": "${workspaceFolder}",
+                "PROJECT_FOLDER": "${workspaceFolderBasename}",
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYDEVD_DISABLE_FILE_VALIDATION": "1",
+            },
+            "justMyCode": true,
+            "pythonArgs": [
+                "-Xfrozen_modules=off",
+            ],
+        },
+        {
+            "name": "retspy_radar init --help",
+            "args": [
+                "init",
+                "--help",
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
@@ -175,10 +202,9 @@
             ],
         },
         {
-            "name": "retspy_radar init -h",
+            "name": "retspy_radar --help",
             "args": [
-                "init",
-                "-h",
+                "--help",
             ],
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}",
@@ -196,5 +222,66 @@
                 "-Xfrozen_modules=off",
             ],
         },
-     ],
+        {
+            "name": "retspy_radar -v",
+            "args": [
+                "-v",
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "module": "retspy_radar",
+            "request": "launch",
+            "type": "debugpy",
+            "env": {
+                "PROJECT_PATH": "${workspaceFolder}",
+                "PROJECT_FOLDER": "${workspaceFolderBasename}",
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYDEVD_DISABLE_FILE_VALIDATION": "1",
+            },
+            "justMyCode": true,
+            "pythonArgs": [
+                "-Xfrozen_modules=off",
+            ],
+        },
+        {
+            "name": "retspy_radar --version",
+            "args": [
+                "--version",
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "module": "retspy_radar",
+            "request": "launch",
+            "type": "debugpy",
+            "env": {
+                "PROJECT_PATH": "${workspaceFolder}",
+                "PROJECT_FOLDER": "${workspaceFolderBasename}",
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYDEVD_DISABLE_FILE_VALIDATION": "1",
+            },
+            "justMyCode": true,
+            "pythonArgs": [
+                "-Xfrozen_modules=off",
+            ],
+        },
+        {
+            "name": "retspy_radar [default]",
+            "args": [],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "module": "retspy_radar",
+            "request": "launch",
+            "type": "debugpy",
+            "env": {
+                "PROJECT_PATH": "${workspaceFolder}",
+                "PROJECT_FOLDER": "${workspaceFolderBasename}",
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYDEVD_DISABLE_FILE_VALIDATION": "1",
+            },
+            "justMyCode": true,
+            "pythonArgs": [
+                "-Xfrozen_modules=off",
+            ],
+        },
+    ],
 }

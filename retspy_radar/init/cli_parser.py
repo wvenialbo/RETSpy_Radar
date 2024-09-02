@@ -29,7 +29,8 @@ class CLIParser(CLIParserBase):
         )
 
         config.add_argument(
-            "-c" "--config-path",
+            "-c",
+            "--config-path",
             dest="config_path",
             metavar=cls.FILE_PATH,
             type=str,

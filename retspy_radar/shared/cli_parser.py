@@ -117,7 +117,8 @@ class CLIParserBase:
         )
 
         config.add_argument(
-            "-c" "--config-path",
+            "-c",
+            "--config-path",
             dest="config_path",
             metavar=cls.FILE_PATH,
             type=str,
@@ -128,7 +129,8 @@ class CLIParserBase:
         )
 
         config.add_argument(
-            "-o" "--output-path",
+            "-o",
+            "--output-path",
             dest="output_path",
             metavar=cls.DIRECTORY_PATH,
             type=str,
@@ -148,7 +150,8 @@ class CLIParserBase:
         )
 
         monitor.add_argument(
-            "-s" "--start-time",
+            "-s",
+            "--start-time",
             dest="start_time",
             metavar=cls.ISO_DATE_TIME,
             type=str,
@@ -161,7 +164,8 @@ class CLIParserBase:
         )
 
         monitor.add_argument(
-            "-e" "--end-time",
+            "-e",
+            "--end-time",
             dest="end_time",
             metavar=cls.ISO_DATE_TIME,
             type=str,
@@ -176,7 +180,8 @@ class CLIParserBase:
         )
 
         monitor.add_argument(
-            "-p" "--scan-period",
+            "-p",
+            "--scan-period",
             dest="scan_period",
             metavar=cls.ISO_TIME_PERIOD,
             type=str,

@@ -31,6 +31,8 @@ def main() -> None:
     Ejecuta los procesos de inicio y arranque de la aplicación, y
     posteriormente inicia la aplicación.
     """
+    exit_code: int = 1
+
     logger: Logger = get_logger(pkg_info.name)
 
     try:
@@ -58,20 +60,20 @@ def main() -> None:
 
     except UnspecifiedCommandError as exc:
         logger.error(f"Debe especificar una acción: {exc}.")
-        exit(1)
 
     except KeyboardInterrupt:
         logger.info("El usuario ha interrumpido la ejecución del programa.")
+        exit_code = 0
 
     except ArgumentError as exc:
         logger.critical(f"Error del analizador de línea de comandos: {exc}.")
-        exit(2)
+        exit_code = 2
 
     except SystemExit as exc:
-        if not exc.code:
-            return
-
         exit_code = int(f"{exc.code}")
+
+        if not exit_code:
+            return
 
         logging_call = {
             0: logger.info,
@@ -79,12 +81,27 @@ def main() -> None:
             2: logger.critical,
         }
 
-        logging_call[exit_code](f"Saliendo del programa: exit_code={exc}.")
-        exit(exit_code)
+        logging_call[exit_code](
+            f"Se abortó el programa: SystemExit(exit_code={exc})."
+        )
 
     # except Exception as exc:
     #     logger.critical(f"No se puede continuar: Error inesperado: {exc}.")
-    #     exit(2)
+    # exit_code = 2
+
+    else:
+        exit_code = 0
+
+    finally:
+        if not exit_code:
+            return
+
+        logger.debug(
+            f"Saliendo de {pkg_info.name} "
+            f"con código de salida {exit_code}."
+        )
+
+        exit(exit_code)
 
 
 if __name__ == PARENT_PROCESS:
