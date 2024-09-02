@@ -16,7 +16,7 @@ class CustomArgumentParser(ArgumentParser):
         self._optionals.title = "Argumentos opcionales"
 
 
-SubParsersAction = SubParsersAction_[CustomArgumentParser]
+type SubParsersAction = SubParsersAction_[CustomArgumentParser]
 
 
 class CLIParserBase:
