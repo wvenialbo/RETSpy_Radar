@@ -34,7 +34,7 @@ class CLINamespace:
 
 class CLIParser(CLIParserBase):
 
-    COMMAND_TITLE = "Comandos"
+    COMMAND_TITLE = "Acciones de servicio y monitoreo"
     COMMAND_NAME = "command"
 
     @classmethod
@@ -46,34 +46,30 @@ class CLIParser(CLIParserBase):
             add_help=False,
         )
 
+        cls.create_subparsers(parser)
+
         cls.setup_parser(parser)
-
-        cls.create_parser_service(parser)
-
-        cls.create_parser_monitor(parser)
 
         return parser
 
     @classmethod
-    def create_parser_monitor(cls, parser: CustomArgumentParser) -> None:
-        monitor_cmd: SubParsersAction = parser.add_subparsers(
+    def create_subparsers(cls, parser: CustomArgumentParser) -> None:
+        commands: SubParsersAction = parser.add_subparsers(
             title=cls.COMMAND_TITLE,
+            # description="Acciones de servicio y monitoreo disponibles.",
+            metavar="{command}",
             dest=cls.COMMAND_NAME,
-            help="Comandos de monitoreo",
+            help="Uno de los comandos siguientes:",
         )
 
-        SimeparCLIParser.create_parser(monitor_cmd)
-        SinarameCLIParser.create_parser(monitor_cmd)
+        # "Comandos de servicio"
 
-    @classmethod
-    def create_parser_service(cls, parser: CustomArgumentParser) -> None:
-        service_cmd: SubParsersAction = parser.add_subparsers(
-            title=cls.COMMAND_TITLE,
-            dest=cls.COMMAND_NAME,
-            help="Comandos de servicio",
-        )
+        InitCLIParser.create_parser(commands)
 
-        InitCLIParser.create_parser(service_cmd)
+        # "Comandos de monitoreo"
+
+        SimeparCLIParser.create_parser(commands)
+        SinarameCLIParser.create_parser(commands)
 
     @classmethod
     def setup_parser(cls, parser: ArgumentParser) -> None:

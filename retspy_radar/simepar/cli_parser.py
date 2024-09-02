@@ -1,4 +1,4 @@
-from argparse import SUPPRESS, ArgumentParser
+from argparse import ArgumentParser
 
 from ..package_info import pkg_info
 from ..shared import CLIParserBase, SubParsersAction
@@ -26,24 +26,8 @@ class CLIParser(CLIParserBase):
 
     @classmethod
     def setup_parser(cls, parser: ArgumentParser) -> None:
-        cls.setup_parser_shared(
-            parser, version=f"{pkg_info.name} {app_info.version}"
-        )
+        cls.setup_parser_shared(parser, version="")
 
         cls.setup_parser_config(parser)
 
-        cls.setup_parser_monitor(parser)
-
-        parser.add_argument(
-            "-i",
-            "--station-ids",
-            dest="station_ids",
-            metavar=cls.ID_STRING,
-            nargs="+",
-            type=set[str],
-            # help="Lista de identificadores de estaciones o grupos de "
-            # "estaciones de radar del SIMEPAR, por defecto es el grupo "
-            # f"de estaciones de prueba: '{cls.DEFAULT_STATIONS[0]}'.",
-            help=SUPPRESS,
-            default=cls.DEFAULT_STATIONS,
-        )
+        cls.setup_parser_monitor(parser, cls.DEFAULT_STATIONS, True)

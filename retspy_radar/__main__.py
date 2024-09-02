@@ -7,6 +7,8 @@ Si no se proveen argumentos, se utilizarán los valores por defecto. Para
 más información, ejecute el script con la opción -h o --help.
 """
 
+from argparse import ArgumentError
+
 from .base.exceptions import (
     InvalidConfigurationFileError,
     UninitializedOutputDirError,
@@ -42,28 +44,47 @@ def main() -> None:
         application_process.run()
 
     except InvalidConfigurationFileError as exc:
-        logger.error(f"No se pudo cargar el archivo de configuración: {exc}")
+        logger.error(f"No se pudo cargar el archivo de configuración: {exc}.")
 
     except UninitializedOutputDirError as exc:
-        logger.error(f"El espacio de trabajo no se ha inicializado: {exc}")
+        logger.error(f"El espacio de trabajo no se ha inicializado: {exc}.")
 
     except UninitializedWorkspaceError as exc:
-        logger.error(f"El espacio de trabajo no se ha inicializado: {exc}")
+        logger.error(f"El espacio de trabajo no se ha inicializado: {exc}.")
         logger.info(
             f"Ejecuta el comando '{pkg_info.name} init' "
             "para inicializar el espacio de trabajo."
         )
 
     except UnspecifiedCommandError as exc:
-        logger.error(f"Debe especificar una acción: {exc}")
+        logger.error(f"Debe especificar una acción: {exc}.")
         exit(1)
 
     except KeyboardInterrupt:
         logger.info("El usuario ha interrumpido la ejecución del programa.")
 
-    except Exception as exc:
-        logger.critical(f"No se puede continuar: Error inesperado: {exc}")
+    except ArgumentError as exc:
+        logger.critical(f"Error del analizador de línea de comandos: {exc}.")
         exit(2)
+
+    except SystemExit as exc:
+        if not exc.code:
+            return
+
+        exit_code = int(f"{exc.code}")
+
+        logging_call = {
+            0: logger.info,
+            1: logger.error,
+            2: logger.critical,
+        }
+
+        logging_call[exit_code](f"Saliendo del programa: exit_code={exc}.")
+        exit(exit_code)
+
+    # except Exception as exc:
+    #     logger.critical(f"No se puede continuar: Error inesperado: {exc}.")
+    #     exit(2)
 
 
 if __name__ == PARENT_PROCESS:

@@ -41,9 +41,8 @@ class CLIParserBase:
         cls, parser: ArgumentParser, version: str
     ) -> ArgumentGroup:
         common: ArgumentGroup = parser.add_argument_group(
-            title="Opciones comunes",
-            description="Opciones que se pueden utilizar "
-            "con cualquier comando.",
+            title="Opciones de programa",
+            # description="Opciones generales del programa.",
         )
 
         common.add_argument(
@@ -54,13 +53,14 @@ class CLIParserBase:
             help="Muestra este mensaje de ayuda y termina.",
         )
 
-        common.add_argument(
-            "-v",
-            "--version",
-            action="version",
-            version=version,
-            help="Muestra la versión del programa y termina.",
-        )
+        if version:
+            common.add_argument(
+                "-v",
+                "--version",
+                action="version",
+                version=version,
+                help="Muestra la versión del programa y termina.",
+            )
 
         return common
 
@@ -113,7 +113,7 @@ class CLIParserBase:
     def setup_parser_config(cls, parser: ArgumentParser) -> None:
         config: ArgumentGroup = parser.add_argument_group(
             title="Opciones de configuración",
-            description="Opciones de archivo y configuración.",
+            # description="Opciones de archivo y configuración.",
         )
 
         config.add_argument(
@@ -139,10 +139,12 @@ class CLIParserBase:
         )
 
     @classmethod
-    def setup_parser_monitor(cls, parser: ArgumentParser) -> None:
+    def setup_parser_monitor(
+        cls, parser: ArgumentParser, stations: list[str], hide_stations: bool
+    ) -> None:
         monitor: ArgumentGroup = parser.add_argument_group(
             title="Opciones de monitoreo",
-            description="Opciones de monitoreo de imágenes de radar.",
+            # description="Opciones de monitoreo de imágenes de radar.",
         )
 
         monitor.add_argument(
@@ -187,3 +189,24 @@ class CLIParserBase:
             "parámetro se ignora.",
             default=cls.DEFAULT_PERIOD_TIME,
         )
+
+        if stations:
+            help = (
+                SUPPRESS
+                if hide_stations
+                else (
+                    "Lista de identificadores de estaciones o grupos "
+                    "de estaciones de radar a monitorear. Por defecto "
+                    f"tiene el valor: '{stations[0]}'."
+                )
+            )
+            monitor.add_argument(
+                "-i",
+                "--station-ids",
+                dest="station_ids",
+                metavar=cls.ID_STRING,
+                nargs="+",
+                type=set[str],
+                help=help,
+                default=stations,
+            )

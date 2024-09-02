@@ -1,4 +1,3 @@
-from ..package_info import pkg_info
 from ..shared import (
     ArgumentGroup,
     ArgumentParser,
@@ -17,6 +16,7 @@ class CLIParser(CLIParserBase):
             help=app_info.help,
             description=f"{app_info.header}: {app_info.help}",
             epilog=app_info.copyright,
+            add_help=False,
         )
 
         cls.setup_parser(subparser)
@@ -25,7 +25,7 @@ class CLIParser(CLIParserBase):
     def setup_parser_config(cls, parser: ArgumentParser) -> None:
         config: ArgumentGroup = parser.add_argument_group(
             title="Opciones de configuración",
-            description="Opciones de archivo y configuración.",
+            # description="Opciones de archivo y configuración.",
         )
 
         config.add_argument(
@@ -42,7 +42,5 @@ class CLIParser(CLIParserBase):
 
     @classmethod
     def setup_parser(cls, parser: ArgumentParser) -> None:
-        cls.setup_parser_shared(
-            parser, version=f"{pkg_info.name} {app_info.version}"
-        )
+        cls.setup_parser_shared(parser, version="")
         cls.setup_parser_config(parser)
