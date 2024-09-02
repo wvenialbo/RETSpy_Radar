@@ -8,17 +8,15 @@ from ..base.exceptions import (
     TimeConversionError,
 )
 from ..base.logging import get_logger
+from ..base.settings import SettingsBasic
 from ..base.utils import console, timing
-from .application_info import pkg_info
-from .robot_smn import RobotSMN
-from .settings_smn import SettingsSMN as Settings
-
-PARENT_PROCESS = "__main__"
-CHILD_PROCESS = "__mp_main__"
+from ..package_info import pkg_info
+from ..shared import RobotBasic, Settings
+from ..sinarame import RobotSMN
 
 
 class Application:
-    def __init__(self, settings: Settings) -> None:
+    def __init__(self, settings: SettingsBasic) -> None:
         """
         Inicializa la aplicación.
 
@@ -30,21 +28,17 @@ class Application:
             El registro de eventos de la aplicación.
         """
         self._logger: Logger = get_logger(pkg_info.name)
-        self._settings: Settings = settings
+        self._settings: Settings = Settings(settings.root)
 
-    def run(self, module_name: str) -> None:
+    def run(self) -> None:
         """
         Inicia la ejecución de la aplicación.
-
-        Parameters
-        ----------
-        module_name : str
-            El nombre del módulo que instanció la aplicación y
-            arrancó el sistema.
         """
+        robot: RobotBasic = self._get_robot()
+
         # Mostrar el banner del programa
 
-        self._print_banner()
+        robot.print_banner()
 
         # Iniciar la ejecución del bot de indexación de datos
 
@@ -54,8 +48,6 @@ class Application:
         # --------------------------------------------------------------
 
         args: dict[str, Any] = self._setup_arguments()
-
-        robot = RobotSMN(self._settings, self._logger)
 
         self._print_summary(args)
 
@@ -76,17 +68,7 @@ class Application:
 
         # --------------------------------------------------------------
 
-        self._print_footer()
-
-    def _print_banner(self) -> None:
-        # Imprime el banner del programa
-
-        print(f"{pkg_info.banner}\n")
-
-    def _print_footer(self) -> None:
-        # Imprime el pie de página del programa
-
-        print(f"{pkg_info.version_full}\n")
+        robot.print_footer()
 
     def _print_summary(self, args: dict[str, Any]) -> None:
         # Imprime el resumen de la ejecución del programa
@@ -106,9 +88,7 @@ class Application:
         print(f"  - Intervalo de escaneo    : {scan_interval}")
         print(f"  - Estaciones a monitorear : {', '.join(station_ids)}\n")
 
-        stations: dict[str, dict[str, Any]] = self._settings.section(
-            "stations"
-        ).to_dict()
+        stations: dict[str, dict[str, Any]] = self._settings.stations
 
         for station_id in station_ids:
             if station_id in stations:
@@ -189,14 +169,14 @@ class Application:
                 "a la fecha de inicio"
             )
 
-        scan_interval = timedelta(seconds=self._settings.scan_interval)
+        scan_interval: timedelta = timing.parse_timedelta(
+            self._settings.scan_interval
+        )
 
         station_ids: list[str] = list()
 
-        stations: dict[str, Any] = self._settings.section("stations").to_dict()
-        groups: dict[str, list[str]] = self._settings.value(
-            "station_groups"
-        ).as_type(dict[str, list[str]])
+        stations: dict[str, Any] = self._settings.stations
+        groups: dict[str, list[str]] = self._settings.station_groups
 
         for station_id in self._settings.station_ids:
             if station_id in stations:
@@ -216,3 +196,25 @@ class Application:
             "scan_interval": scan_interval,
             "station_ids": station_ids,
         }
+
+    def _get_robot(self) -> RobotBasic:
+        """
+        Retorna el robot de la aplicación.
+
+        Returns
+        -------
+        RobotBasic
+            El robot de la aplicación.
+
+        Raises
+        ------
+        ValueError
+            Si el servicio especificado no está soportado.
+        """
+        robots: list[type[RobotBasic]] = [RobotSMN]
+
+        for robot in robots:
+            if self._settings.service == robot.command:
+                return robot(self._settings, self._logger)
+
+        raise ValueError("El servicio especificado no está soportado.")

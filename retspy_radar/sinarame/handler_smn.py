@@ -7,8 +7,8 @@ from requests import Response
 from requests.exceptions import RequestException
 
 from ..base.exceptions import RequestError, UnexpectedResponseError
-from ..base.requests.handler_base import RequestsHandlerBase
-from .settings_smn import SettingsSMN
+from ..base.requests import RequestsHandlerBase
+from ..shared import APPLICATION_JSON, IMAGE_PNG, Headers, Settings
 
 
 class RequestsHandlerSNM(RequestsHandlerBase):
@@ -33,7 +33,9 @@ class RequestsHandlerSNM(RequestsHandlerBase):
         Obtiene el código de estado de la última solicitud HTTP.
     """
 
-    def __init__(self, settings: SettingsSMN) -> None:
+    TOKEN_PATTERN: str = r"localStorage\.setItem\('token',\s*'([^']+)'\);"
+
+    def __init__(self, settings: Settings) -> None:
         """
         Inicializa una nueva instancia de la clase RequestsSNM.
 
@@ -44,7 +46,7 @@ class RequestsHandlerSNM(RequestsHandlerBase):
         """
         super().__init__()
 
-        self._settings: SettingsSMN = settings
+        self._settings: Settings = settings
 
     def download_image(self, image_name: str) -> Iterator[Any]:
         """
@@ -74,10 +76,12 @@ class RequestsHandlerSNM(RequestsHandlerBase):
 
             REQUEST_URL: str = f"{self._settings.repository_url}{image_name}"
 
-            REQUEST_HEADERS: dict[str, str] = self._settings.REPOSITORY_HEADERS
+            REQUEST_HEADERS = Headers(
+                self._settings.base_url, accept=IMAGE_PNG
+            )
 
             response: Response = requests.get(
-                REQUEST_URL, headers=REQUEST_HEADERS
+                REQUEST_URL, headers=REQUEST_HEADERS.headers
             )
 
             # Devolver los datos de la imagen como un iterador de bytes
@@ -117,16 +121,16 @@ class RequestsHandlerSNM(RequestsHandlerBase):
 
             REQUEST_URL: str = self._settings.radar_url
 
-            REQUEST_HEADERS: dict[str, str] = self._settings.TOKEN_HEADERS
+            REQUEST_HEADERS = Headers(self._settings.base_url)
 
             response: Response = self.request.get(
-                REQUEST_URL, headers=REQUEST_HEADERS
+                REQUEST_URL, headers=REQUEST_HEADERS.headers
             )
 
             # Extraer el token de autorización de la respuesta
 
             match: Match[str] | None = re.search(
-                self._settings.TOKEN_PATTERN, response.text
+                self.TOKEN_PATTERN, response.text
             )
 
             # Si se encontró el token de autorización, devolverlo
@@ -177,13 +181,16 @@ class RequestsHandlerSNM(RequestsHandlerBase):
 
             REQUEST_URL: str = f"{self._settings.inventory_url}{station_id}"
 
-            REQUEST_HEADERS: dict[str, str] = (
-                self._settings.IMAGE_SET_HEADERS
-                | {"authorization": f"JWT {auth_token}"}
+            AUTH_TOKEN: str = f"JWT {auth_token}"
+
+            REQUEST_HEADERS = Headers(
+                self._settings.base_url,
+                accept=APPLICATION_JSON,
+                authorization=AUTH_TOKEN,
             )
 
             response: Response = self.request.get(
-                REQUEST_URL, headers=REQUEST_HEADERS
+                REQUEST_URL, headers=REQUEST_HEADERS.headers
             )
 
             # Extraer el contenido inventario (JSON) de la respuesta

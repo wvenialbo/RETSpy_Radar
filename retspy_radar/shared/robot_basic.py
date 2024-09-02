@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
+from logging import Logger
 
-from .exceptions import AuthorizationExpiredError
-from .process.timer import ProcessTimer
+from ..base.exceptions import AuthorizationExpiredError
+from ..base.process import ProcessTimer
+from .settings import Settings
 
 
 class RobotBase(ABC):
@@ -263,3 +265,59 @@ class RobotBase(ABC):
         Realiza las operaciones necesarias para preparar el proceso de
         recolección de datos.
         """
+
+    @abstractmethod
+    def print_banner(self) -> None:
+        """
+        Imprime el banner del programa.
+
+        Imprime el banner del programa en la consola.
+        """
+
+    @abstractmethod
+    def print_footer(self) -> None:
+        """
+        Imprime el pie de página del programa.
+
+        Imprime el pie de página del programa en la consola.
+        """
+
+    command: str = ""
+
+
+class RobotBasic(RobotBase):
+    """
+    Indexador de imágenes de radar del SINARAME.
+
+    El indexador de imágenes de radar del Sistema Nacional de Radares
+    Meteorológicos (SINARAME), del Servicio Meteorológico Nacional (SMN)
+    argentino, permite descargar las imágenes de radar de las estaciones
+    del SINARAME desde el sitio web de la SMN para guardarlas en un
+    repositorio local. Las imágenes de radar se actualizan cada 10
+    minutos.
+
+    El objetivo del bot es recopilar las imágenes de radar asociadas a
+    eventos meteorológicos extremos en la región de interés, para
+    archivarlos en una base de datos de reportes de eventos de tiempo
+    severo, para su análisis o estudio posterior.
+
+    Methods
+    -------
+    run(station_ids, from_datetime=None, to_datetime=None,
+        for_timedelta=None) Ejecuta el proceso de recolección de datos.
+        Heredado de la clase base `RobotBase`.
+    """
+
+    def __init__(self, settings: Settings, logger: Logger) -> None:
+        """
+        Inicializa una nueva instancia del indexador de imágenes.
+
+        Parameters
+        ----------
+        settings : SettingsSMN
+            Los ajustes de configuración del indexador de imágenes.
+        logger : Logger
+            El registro de eventos del indexador de imágenes.
+        """
+        self._logger: Logger = logger
+        self._settings: Settings = settings

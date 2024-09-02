@@ -1,30 +1,21 @@
-from ..package_info import pkg_info
+from ..application_info import ApplicationInfo as BaseApplicationInfo
 
 
-class ApplicationInfo:
+class ApplicationInfo(BaseApplicationInfo):
     """Información de la aplicación."""
 
-    alias: str = "RETSpy-SMN"
+    command: str = "sinarame"
 
-    banner: str = f"{alias} - {pkg_info.description}"
-    
-    copyright: str = "Copyright (C) 2024 El equipo de desarrollo de RETSPy"
+    header: str = "Indexador de imágenes y mosaicos de radar del SINARAME"
 
-    detail: str = (
-        "Indexador de imágenes y mosaicos de radar del Servicio "
-        "Meteorológico Nacional argentino (SMN): Esta aplicación "
-        "permite descargar imágenes de radar de las estaciones del "
+    help: str = (
+        "Descarga imágenes y mosaicos de radar de las estaciones del "
         "Sistema Nacional de Radares Meteorológicos (SINARAME) "
-        "administrado por el SMN."
+        "administrado por el Servicio Meteorológico Nacional argentino "
+        "(SMN)."
     )
 
-    title: str = f"{banner} ({pkg_info.version})"
-
-    settings_model: str = "sinarame"
-
-    default_settings: str = "settings.json"
-
-    user_settings: str = "settings.smn.json"
+    version: str = "1.0.1"
 
 
 app_info = ApplicationInfo

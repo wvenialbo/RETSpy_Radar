@@ -1,5 +1,9 @@
+import json
+from io import TextIOWrapper
+from json import JSONDecodeError
 from typing import Any
 
+from ..exceptions import InvalidConfigurationFileError
 from .settings_base import SettingsBase
 
 
@@ -18,52 +22,67 @@ class SettingsBasic(SettingsBase):
         Obtiene la raíz de los ajustes de configuración.
     """
 
-    def __init__(self, settings: dict[str, Any]) -> None:
+    def __init__(self, data: Any | None = None) -> None:
         """
-        Inicializa una nueva instancia de la clase SettingsBasic.
+        Inicializa los ajustes de configuración.
 
         Parameters
         ----------
-        settings : dict[str, Any]
-            Un diccionario con los ajustes de configuración.
+        settings : Any, optional
+            Un diccionario con los ajustes de configuración. Si no se
+            especifica, se crea una sección de ajustes de configuración
+            vacía.
         """
-        super().__init__(settings)
+        super().__init__(data)
 
-    @classmethod
-    def load(
-        cls, settings_path: str, fail_if_not_exists: bool = True
-    ) -> "SettingsBasic":
-        """
-        Carga los ajustes de configuración desde un archivo.
-
-        Parameters
-        ----------
-        settings_path : str
-            La ruta del archivo de ajustes de configuración.
-        fail_if_not_exists : bool, optional
-            Indica si se debe fallar si el archivo no existe.
-
-        Returns
-        -------
-        SettingsBasic
-            Una instancia de la clase SettingsBasic con los ajustes
-            cargados desde el archivo.
-        """
-        if fail_if_not_exists:
-            settings_dict: dict[str, Any] = cls._load_settings(settings_path)
-
-        else:
-            settings_dict = cls._acquire_settings(settings_path)
-
-        return SettingsBasic(settings_dict)
-
-    def save(self, settings_path: str) -> None:
+    def dump(self, file: TextIOWrapper) -> None:
         """
         Guarda los ajustes de configuración en un archivo.
 
         Parameters
         ----------
-        settings_path : str
-            La ruta del archivo de ajustes de configuración.
+        file : TextIOWrapper
+            El archivo de ajustes de configuración.
+
+        Raises
+        ------
+        InvalidConfigurationFileError
+            Si no se pudieron guardar los ajustes de configuración.
         """
-        self._save_settings(settings_path, self._root.to_dict())
+        try:
+            # Escribir los ajustes de configuración en el archivo
+
+            json.dump(self._root.to_dict(), file, indent=4)
+
+        except TypeError:
+            raise InvalidConfigurationFileError(
+                "No se pudieron guardar los ajustes de configuración"
+            )
+
+    def load(self, file: TextIOWrapper) -> None:
+        """
+        Carga los ajustes de configuración desde un archivo.
+
+        Parameters
+        ----------
+        file : TextIOWrapper
+            El archivo de ajustes de configuración.
+
+        Raises
+        ------
+        InvalidConfigurationFileError
+            Si no se pudieron cargar los ajustes de configuración.
+        """
+        try:
+            # Cargar los ajustes de configuración en un diccionario y
+            # actualizar el objeto raíz de ajustes de configuración.
+            # Se asume archivo JSON
+
+            settings: Any = json.load(file)
+            self.update(settings)
+
+        except JSONDecodeError as exc:
+            raise InvalidConfigurationFileError(
+                "El archivo de configuración no tiene formato "
+                f"JSON válido: {exc}"
+            ) from exc

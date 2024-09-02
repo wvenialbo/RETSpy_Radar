@@ -1,8 +1,9 @@
 import os
 from os import path
 
-from .application_info import app_info
-from .settings_smn import SettingsSMN as Settings
+from ..application_info import app_info
+from ..base.settings import SettingsBasic
+from ..base.utils import settings as config
 
 
 class Startup:
@@ -10,7 +11,7 @@ class Startup:
     def __init__(self, module_file_path: str) -> None:
         self._module_file_path: str = module_file_path
 
-    def run(self) -> Settings:
+    def run(self) -> SettingsBasic:
         # Obtener la ruta del directorio de instalación del módulo
         # y el directorio de trabajo actual
 
@@ -22,7 +23,7 @@ class Startup:
             current_dir, app_info.user_settings
         )
 
-        settings: Settings = Settings.load(
+        settings: SettingsBasic = config.load(
             user_settings_path, fail_if_not_exists=False
         )
 

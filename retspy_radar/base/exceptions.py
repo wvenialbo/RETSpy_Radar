@@ -105,3 +105,12 @@ class UninitializedOutputDirError(RuntimeError):
 
     def __init__(self, message: str) -> None:
         super().__init__(message)
+
+
+class UnspecifiedCommandError(RuntimeError):
+    """
+    Lanzado si no se pudo inicializar el espacio de trabajo.
+    """
+
+    def __init__(self, message: str) -> None:
+        super().__init__(message)

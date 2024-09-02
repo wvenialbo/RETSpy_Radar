@@ -2,6 +2,7 @@ from typing import LiteralString
 
 PRJ_NAME: LiteralString = "RETSpy"
 NAT_NAME: LiteralString = f"{PRJ_NAME} Radar"
+UAG_NAME: LiteralString = NAT_NAME.replace(" ", "-")
 GIT_NAME: LiteralString = NAT_NAME.replace(" ", "_")
 RAW_NAME: LiteralString = GIT_NAME.lower()
 PKG_NAME: LiteralString = RAW_NAME.replace("_", "-")

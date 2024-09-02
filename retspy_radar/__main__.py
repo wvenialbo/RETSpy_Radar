@@ -11,10 +11,15 @@ from .base.exceptions import (
     InvalidConfigurationFileError,
     UninitializedOutputDirError,
     UninitializedWorkspaceError,
+    UnspecifiedCommandError,
 )
-from .base.logging.logger import Logger, get_logger
+from .base.logging import Logger, get_logger
+from .base.settings import SettingsBasic
+from .core import Application, Bootstrap, Startup
 from .package_info import pkg_info
-from .sinarame import Application, Bootstrap, SettingsSMN, Startup
+
+PARENT_PROCESS = "__main__"
+CHILD_PROCESS = "__mp_main__"
 
 
 def main() -> None:
@@ -28,16 +33,13 @@ def main() -> None:
 
     try:
         startup_routines = Startup(__file__)
-        settings: SettingsSMN = startup_routines.run()
+        settings: SettingsBasic = startup_routines.run()
 
         bootstrap_routines = Bootstrap(settings)
         settings = bootstrap_routines.run()
 
-        if not settings:
-            return
-
         application_process = Application(settings)
-        application_process.run(__name__)
+        application_process.run()
 
     except InvalidConfigurationFileError as exc:
         logger.error(f"No se pudo cargar el archivo de configuración: {exc}")
@@ -52,6 +54,9 @@ def main() -> None:
             "para inicializar el espacio de trabajo."
         )
 
+    except UnspecifiedCommandError as exc:
+        logger.error(f"Debe especificar una acción: {exc}")
+
     except KeyboardInterrupt:
         logger.info("El usuario ha interrumpido la ejecución del programa.")
 
@@ -60,5 +65,5 @@ def main() -> None:
         exit(1)
 
 
-if __name__ == "__main__":
+if __name__ == PARENT_PROCESS:
     main()

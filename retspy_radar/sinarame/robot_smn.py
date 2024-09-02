@@ -1,3 +1,4 @@
+import tempfile
 from logging import Logger
 from os import path
 from typing import Any, Iterator
@@ -9,14 +10,16 @@ from ..base.exceptions import (
     RequestError,
     UnexpectedResponseError,
 )
-from ..base.process.sleep import ProcessSleep
-from ..base.robot_base import RobotBase
-from ..base.settings.settings_basic import SettingsBasic
+from ..base.process import ProcessSleep
+from ..base.settings import SettingsBasic
+from ..base.utils import settings as config
+from ..base.utils import timing
+from ..shared import RobotBasic, Settings
+from .application_info import app_info
 from .handler_smn import RequestsHandlerSNM
-from .settings_smn import SettingsSMN
 
 
-class RobotSMN(RobotBase):
+class RobotSMN(RobotBasic):
     """
     Indexador de imágenes de radar del SINARAME.
 
@@ -39,7 +42,9 @@ class RobotSMN(RobotBase):
         Heredado de la clase base `RobotBase`.
     """
 
-    def __init__(self, settings: SettingsSMN, logger: Logger) -> None:
+    command: str = app_info.command
+
+    def __init__(self, settings: Settings, logger: Logger) -> None:
         """
         Inicializa una nueva instancia del indexador de imágenes.
 
@@ -51,7 +56,11 @@ class RobotSMN(RobotBase):
             El registro de eventos del indexador de imágenes.
         """
         self._logger: Logger = logger
-        self._settings: SettingsSMN = settings
+        self._settings: Settings = settings
+
+        temp_dir: str = tempfile.gettempdir()
+        temp_file: str = f"{self.command}.access_key.json"
+        self._credentials_path: str = path.join(temp_dir, temp_file)
 
     def _filter_downloaded_images(self, image_set: set[str]) -> set[str]:
         """
@@ -124,7 +133,9 @@ class RobotSMN(RobotBase):
         # ser bloqueado, luego obtener la lista de imágenes
 
         wait_for_next_authorization = ProcessSleep(
-            self._settings.wait_for_next_authorization
+            timing.parse_timedelta(
+                self._settings.wait_for_next_authorization
+            ).seconds
         )
 
         wait_for_next_authorization.run()
@@ -133,18 +144,14 @@ class RobotSMN(RobotBase):
             token: str = ""
 
             if not renew:
-                token = self._load_token_from_file(
-                    self._settings.CREDENTIALS_PATH
-                )
+                token = self._load_token_from_file(self._credentials_path)
 
                 renew = not token
 
             if renew:
                 token = self._get_token_from_server(api_key)
 
-                self._save_token_to_file(
-                    self._settings.CREDENTIALS_PATH, token
-                )
+                self._save_token_to_file(self._credentials_path, token)
 
             self._logger.info("Token de acceso obtenido correctamente.")
 
@@ -196,7 +203,9 @@ class RobotSMN(RobotBase):
         # La clave de identificación no se utiliza en esta versión
 
         wait_for_next_request = ProcessSleep(
-            self._settings.wait_for_next_request
+            timing.parse_timedelta(
+                self._settings.wait_for_next_request
+            ).seconds
         )
 
         requests = RequestsHandlerSNM(self._settings)
@@ -251,7 +260,9 @@ class RobotSMN(RobotBase):
         # La clave de identificación no se utiliza en esta versión
 
         wait_for_next_request = ProcessSleep(
-            self._settings.wait_for_next_request
+            timing.parse_timedelta(
+                self._settings.wait_for_next_request
+            ).seconds
         )
 
         requests = RequestsHandlerSNM(self._settings)
@@ -351,15 +362,15 @@ class RobotSMN(RobotBase):
             Si el archivo de credenciales no contiene un token de acceso
             o no es válido.
         """
-        credentials: SettingsBasic = SettingsBasic.load(
+        credentials: SettingsBasic = config.load(
             credentials_path, fail_if_not_exists=False
         )
 
-        if credentials.is_empty():
+        if not credentials:
             return ""
 
         if credentials.has("token"):
-            return credentials.value("token").as_type(str)
+            return credentials["token"].as_type(str)
 
         raise InvalidConfigurationFileError(
             "El archivo de credenciales no contiene un token de acceso."
@@ -434,8 +445,22 @@ class RobotSMN(RobotBase):
             Si no se pudo guardar el token de acceso en el archivo de
             credenciales.
         """
-        credentials_dict: dict[str, str] = {"token": token}
+        credentials = SettingsBasic({"token": token})
 
-        credentials = SettingsBasic(credentials_dict)
+        config.save(credentials_path, credentials)
 
-        credentials.save(credentials_path)
+    def print_banner(self) -> None:
+        """
+        Imprime el banner del programa.
+
+        Imprime el banner del programa en la consola.
+        """
+        print(f"{app_info.banner}\n")
+
+    def print_footer(self) -> None:
+        """
+        Imprime el pie de página del programa.
+
+        Imprime el pie de página del programa en la consola.
+        """
+        print(f"{app_info.alias} {app_info.version}\n")

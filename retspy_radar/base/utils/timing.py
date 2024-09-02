@@ -245,7 +245,9 @@ class timing:
             Si el valor numérico en el rango de tiempo es inválido.
         """
         # Patrón para extraer los componentes de la duración
-        TD_PATTERN: str = r"PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?"
+        TD_PATTERN: str = (
+            r"P(?:(\d+)D)?T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?(?:(\d+)m)?"
+        )
 
         match: Match[str] | None = re.match(TD_PATTERN, td_str)
 
@@ -255,18 +257,22 @@ class timing:
                 "se espera intervalo de tiempo en formato ISO 8601"
             )
 
+        days: str
         hours: str
         minutes: str
         seconds: str
+        milliseconds: str
 
-        hours, minutes, seconds = match.groups()
+        days, hours, minutes, seconds, milliseconds = match.groups()
 
         try:
 
             td_values: dict[str, int] = {
+                "days": int(days) if days else 0,
                 "hours": int(hours) if hours else 0,
                 "minutes": int(minutes) if minutes else 0,
                 "seconds": int(seconds) if seconds else 0,
+                "milliseconds": int(milliseconds) if milliseconds else 0,
             }
 
             return timedelta(**td_values)

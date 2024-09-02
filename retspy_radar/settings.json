@@ -5,7 +5,7 @@
         "chunk_size": 1024,
         "repository_path": "./"
     },
-    "models": [
+    "services": [
         "sinarame",
         "simepar"
     ],
@@ -15,7 +15,6 @@
         "scan_interval": "PT1M"
     },
     "sinarame": {
-        "version": "1.0",
         "metadata": {
             "name": "SINARAME",
             "description": "Sistema Nacional de Radares Meteorológicos",
@@ -25,7 +24,8 @@
         },
         "server": {
             "base_url": "https://www.smn.gob.ar/",
-            "radar_url": "https://www.smn.gob.ar/radar/",
+            "bypassed_url": "https://www.smn.gob.ar/radar/",
+            "radar_url": "http://200.16.116.35/radar/",
             "inventory_url": "https://ws1.smn.gob.ar/v1/images/radar/",
             "repository_url": "https://estaticos.smn.gob.ar/vmsr/radar/"
         },
@@ -154,12 +154,12 @@
         }
     },
     "simepar": {
-        "version": "1.0",
         "metadata": {
             "name": "SIMEPAR",
             "description": "Sistema de Tecnologia e Monitoramento Ambiental do Paraná",
             "organization": "Secretaria de Estado do Desenvolvimento Sustentável (SEDEST)",
-            "country": "Brasil"
+            "country": "Brasil",
+            "product": "mosaic"
         },
         "server": {
             "base_url": "http://www.simepar.br/",
