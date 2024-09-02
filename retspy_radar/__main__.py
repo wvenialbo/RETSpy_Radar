@@ -56,13 +56,14 @@ def main() -> None:
 
     except UnspecifiedCommandError as exc:
         logger.error(f"Debe especificar una acción: {exc}")
+        exit(1)
 
     except KeyboardInterrupt:
         logger.info("El usuario ha interrumpido la ejecución del programa.")
 
     except Exception as exc:
         logger.critical(f"No se puede continuar: Error inesperado: {exc}")
-        exit(1)
+        exit(2)
 
 
 if __name__ == PARENT_PROCESS:
