@@ -85,9 +85,13 @@ def main() -> None:
             f"Se abortó el programa: SystemExit(exit_code={exc})."
         )
 
-    # except Exception as exc:
-    #     logger.critical(f"No se puede continuar: Error inesperado: {exc}.")
-    # exit_code = 2
+    except (AssertionError, OSError, KeyError, TypeError, ValueError) as exc:
+        logger.critical(f"Error de programación: {exc}.")
+        exit_code = 2
+
+    except Exception as exc:
+        logger.critical(f"No se puede continuar: Error inesperado: {exc}.")
+        exit_code = 2
 
     else:
         exit_code = 0

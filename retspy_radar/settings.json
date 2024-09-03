@@ -150,6 +150,21 @@
                 "name": "Patquía (La Rioja)",
                 "lat": -30.030959269847997,
                 "lon": -66.87629521523205
+            },
+            "COMP_ARG": {
+                "name": "Mosaico general (Argentina)",
+                "lat": 0.0,
+                "lon": 0.0
+            },
+            "COMP_CEN": {
+                "name": "Mosaico - región central (Argentina)",
+                "lat": 0.0,
+                "lon": 0.0
+            },
+            "COMP_NOR": {
+                "name": "Mosaico - región norte (Argentina)",
+                "lat": 0.0,
+                "lon": 0.0
             }
         }
     },

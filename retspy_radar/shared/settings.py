@@ -30,48 +30,75 @@ class Settings:
             settings["timing"].update(service["timing"])
 
         try:
-            assert service.has("metadata")
-            assert service["metadata"].has("name")
-            assert service["metadata"].has("description")
-            assert service["metadata"].has("organization")
-            assert service["metadata"].has("country")
-            assert service["metadata"].has("product")
+            assert service.has("metadata"), "Falta información del servicio"
+            assert service["metadata"].has(
+                "name"
+            ), "Falta el nombre del servicio"
+            assert service["metadata"].has(
+                "description"
+            ), "Falta la descripción del servicio"
+            assert service["metadata"].has(
+                "organization"
+            ), "Falta la organización del servicio"
+            assert service["metadata"].has(
+                "country"
+            ), "Falta el país del servicio"
+            assert service["metadata"].has(
+                "product"
+            ), "Falta el producto del servicio"
 
-            assert service.has("server")
-            assert service["server"].has("base_url")
-            assert service["server"].has("radar_url")
-            assert service["server"].has("inventory_url")
-            assert service["server"].has("repository_url")
+            assert service.has("server"), "Falta información del servidor"
+            assert service["server"].has(
+                "base_url"
+            ), "Falta la URL base del servicio"
+            assert service["server"].has(
+                "radar_url"
+            ), "Falta la URL de radar del servicio"
+            assert service["server"].has(
+                "inventory_url"
+            ), "Falta la URL de inventario del servicio"
+            assert service["server"].has(
+                "repository_url"
+            ), "Falta la URL de repositorio del servicio"
 
-            assert service.has("station_groups")
-            assert service.has("stations")
+            assert service.has(
+                "station_groups"
+            ), "Falta información de grupos de estaciones"
+            assert service.has("stations"), "Falta información de estaciones"
 
-            stations: dict[str, dict[str, Any]] = service["stations"].as_type(
-                dict[str, dict[str, Any]]
-            )
+            stations: dict[str, dict[str, Any]] = service["stations"].to_dict()
 
             station_groups: dict[str, list[str]] = service[
                 "station_groups"
-            ].as_type(dict[str, list[str]])
+            ].to_dict()
 
             for station_ids in station_groups.values():
                 for station_id in station_ids:
-                    assert station_id in stations
+                    assert (
+                        station_id in stations
+                    ), f"La estación '{station_id}' no existe"
 
             for station_id in stations.keys():
-                assert service["stations"][station_id].has("name")
-                assert service["stations"][station_id].has("lat")
-                assert service["stations"][station_id].has("lon")
+                assert service["stations"][station_id].has(
+                    "name"
+                ), f"La estación '{station_id}' no tiene nombre"
+                assert service["stations"][station_id].has(
+                    "lat"
+                ), f"La estación '{station_id}' no tiene latitud"
+                assert service["stations"][station_id].has(
+                    "lon"
+                ), f"La estación '{station_id}' no tiene longitud"
 
         except KeyError as exc:
             raise InvalidConfigurationFileError(
                 f"La clave {exc} no existe en el archivo de configuración"
-            )
+            ) from exc
 
-        except AssertionError:
+        except AssertionError as exc:
             raise InvalidConfigurationFileError(
-                "El archivo de configuración no es válido o está corrupto"
-            )
+                "El archivo de configuración no es válido o está corrupto: "
+                f"{exc}"
+            ) from exc
 
         service_dict: dict[str, Any] = service.to_dict()
 
