@@ -63,10 +63,6 @@ class Bootstrap:
 
         self._setup_arguments(namespace)
 
-        # Configurar el color de la consola
-
-        os.system("color")
-
         return self._settings
 
     def _check_settings(self) -> None:
@@ -137,6 +133,12 @@ class Bootstrap:
         # salir
 
         if path.exists(user_settings_path):
+            if not path.isfile(user_settings_path):
+                raise IsADirectoryError(
+                    f"La ruta del archivo de configuración es un directorio: "
+                    f"'{user_settings_path}'"
+                )
+
             overwrite: str = console.prompt(
                 "El archivo de configuración ya existe. "
                 "¿Desea sobrescribirlo?",
@@ -186,10 +188,10 @@ class Bootstrap:
             {
                 "args": {
                     "command": namespace.command,
-                    "start_time": namespace.start_time,
-                    "end_time": namespace.end_time,
+                    "start_time": namespace.start_time or "",
+                    "end_time": namespace.end_time or "",
                     "scan_period": namespace.scan_period,
-                    "station_ids": namespace.station_ids,
+                    "station_ids": namespace.station_ids or [],
                 }
             }
         )
