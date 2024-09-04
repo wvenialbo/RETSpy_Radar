@@ -2,13 +2,12 @@ import re
 from re import Match
 from typing import Any, Iterator
 
-import requests
 from requests import Response
 from requests.exceptions import RequestException
 
 from ..base.exceptions import RequestError, UnexpectedResponseError
 from ..base.requests import RequestsHandlerBase
-from ..shared import APPLICATION_JSON, IMAGE_PNG, Headers, Settings
+from ..shared import APPLICATION_JSON, IMAGE_PNG, TEXT_HTML, Headers, Settings
 
 
 class RequestsHandlerSNM(RequestsHandlerBase):
@@ -74,14 +73,16 @@ class RequestsHandlerSNM(RequestsHandlerBase):
         try:
             # Realizar la solicitud HTTP para descargar la imagen
 
-            REQUEST_URL: str = f"{self._settings.repository_url}{image_name}"
+            request_url: str = f"{self._settings.repository_url}{image_name}"
 
-            REQUEST_HEADERS = Headers(
+            request_headers = Headers(
                 self._settings.base_url, accept=IMAGE_PNG
             )
 
-            response: Response = requests.get(
-                REQUEST_URL, headers=REQUEST_HEADERS.headers
+            response: Response = self.request.get(
+                request_url,
+                headers=request_headers.headers,
+                timeout=self._settings.request_timeout,
             )
 
             # Devolver los datos de la imagen como un iterador de bytes
@@ -91,8 +92,8 @@ class RequestsHandlerSNM(RequestsHandlerBase):
 
         except RequestException as exc:
             raise RequestError(
+                f"No se pudo descargar la imagen '{image_name}",
                 self.status_code,
-                f"No se pudo descargar la imagen '{image_name}: {exc}",
             ) from exc
 
     def get_access_token(self) -> str:
@@ -119,12 +120,16 @@ class RequestsHandlerSNM(RequestsHandlerBase):
         try:
             # Realizar la solicitud HTTP para obtener la autorización
 
-            REQUEST_URL: str = self._settings.radar_url
+            request_url: str = self._settings.radar_url
 
-            REQUEST_HEADERS = Headers(self._settings.base_url)
+            request_headers = Headers(
+                self._settings.base_url, accept=TEXT_HTML
+            )
 
             response: Response = self.request.get(
-                REQUEST_URL, headers=REQUEST_HEADERS.headers
+                request_url,
+                headers=request_headers.headers,
+                timeout=self._settings.request_timeout,
             )
 
             # Extraer el token de autorización de la respuesta
@@ -140,8 +145,8 @@ class RequestsHandlerSNM(RequestsHandlerBase):
 
         except RequestException as exc:
             raise RequestError(
+                "Error al solicitar el código de autorización",
                 self.status_code,
-                f"Error al solicitar el código de autorización: {exc}",
             ) from exc
 
         raise UnexpectedResponseError(
@@ -179,28 +184,30 @@ class RequestsHandlerSNM(RequestsHandlerBase):
             # Realizar la solicitud HTTP para obtener la lista de
             # imágenes
 
-            REQUEST_URL: str = f"{self._settings.inventory_url}{station_id}"
+            request_url: str = f"{self._settings.inventory_url}{station_id}"
 
-            AUTH_TOKEN: str = f"JWT {auth_token}"
+            jwt_auth: str = f"JWT {auth_token}"
 
-            REQUEST_HEADERS = Headers(
+            request_headers = Headers(
                 self._settings.base_url,
                 accept=APPLICATION_JSON,
-                authorization=AUTH_TOKEN,
+                authorization=jwt_auth,
             )
 
             response: Response = self.request.get(
-                REQUEST_URL, headers=REQUEST_HEADERS.headers
+                request_url,
+                headers=request_headers.headers,
+                timeout=self._settings.request_timeout,
             )
 
             # Extraer el contenido inventario (JSON) de la respuesta
 
-            CONTENT: dict[str, Any] = response.json()
+            content: dict[str, Any] = response.json()
 
             # Extraer la lista de imágenes del contenido
 
-            if "list" in CONTENT:
-                return CONTENT["list"]
+            if "list" in content:
+                return content["list"]
 
             # Comentario: aunque no hayan imágenes disponibles de una
             # estación, el contenido siempre es retornado por el servido
@@ -211,9 +218,9 @@ class RequestsHandlerSNM(RequestsHandlerBase):
 
         except RequestException as exc:
             raise RequestError(
-                self.status_code,
                 "Error al descargar la lista de imágenes "
-                f"de la estación '{station_id}': {exc}",
+                f"de la estación '{station_id}'",
+                self.status_code,
             ) from exc
 
         raise UnexpectedResponseError(

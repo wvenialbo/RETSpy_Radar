@@ -1,4 +1,3 @@
-import json
 from typing import Any, Type, TypeVar, cast
 
 from .settings_section import SettingsSection
@@ -274,19 +273,7 @@ class SettingsValue(SettingsSection):
         else:
             section = self._get_valid_section(data)
 
-        # Validar los valores de ajuste de configuración antes de
-        # asimilar la sección cuando el argumento es un diccionario:
-
-        try:
-            assert json.dumps(section)
-
-        except TypeError as exc:
-            raise ValueError(
-                "Los valores de ajuste de configuración no son válidos"
-            ) from exc
-
-        # Una sección de valores de ajuste de configuración válida debe
-        # ser un diccionario serializable a JSON.
+        # Asimilar la sección cuando el argumento es un diccionario.
 
         root.update(section)
 

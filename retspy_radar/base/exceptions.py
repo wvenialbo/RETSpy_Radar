@@ -10,14 +10,14 @@ ExitCode: TypeAlias = str | int | None
 ErrorHandler: TypeAlias = Callable[..., None]
 
 
-class ApplicationError(Exception):
+class BaseError(Exception):
     """
-    Lanzado si hubo un error en la aplicación.
+    Clase base para las excepciones personalizadas.
     """
 
-    def __init__(self, what: str, exit_code: ExitCode = 1) -> None:
+    def __init__(self, what: str, some_code: ExitCode) -> None:
         super().__init__(what)
-        self._exit_code = exit_code
+        self._some_code: ExitCode = some_code
 
     @staticmethod
     def _why_chain(exc: BaseException | None) -> str:
@@ -43,14 +43,6 @@ class ApplicationError(Exception):
         return ": ".join(messages)
 
     @property
-    def exit_code(self) -> ExitCode:
-        return self._exit_code
-
-    @exit_code.setter
-    def exit_code(self, value: ExitCode) -> None:
-        self._exit_code = value
-
-    @property
     def which(self) -> str:
         return self.__class__.__name__
 
@@ -67,21 +59,65 @@ class ApplicationError(Exception):
         return self._why_chain(self.__cause__)
 
 
+class ApplicationError(BaseError):
+    """
+    Lanzado si hubo un error en la aplicación.
+    """
+
+    def __init__(self, what: str, exit_code: int = 1) -> None:
+        super().__init__(what, exit_code)
+
+    @property
+    def exit_code(self) -> ExitCode:
+        return self._some_code
+
+
 class AuthorizationError(ApplicationError):
     """
     Lanzado si no se pudo obtener un token de acceso.
     """
 
 
-class AuthorizationExpiredError(RuntimeError):
-    """
-    Lanzado si el token de acceso ha expirado.
-    """
-
-
 class ConfigurationFileError(ApplicationError):
     """
     Lanzado si el acceso al archivo de configuración produjo errores.
+    """
+
+
+class UninitializedOutputDirError(ApplicationError):
+    """
+    Lanzado si no se pudo inicializar el directorio de salida.
+    """
+
+
+class UninitializedWorkspaceError(ApplicationError):
+    """
+    Lanzado si no se pudo inicializar el espacio de trabajo.
+    """
+
+
+class UnspecifiedCommandError(ApplicationError):
+    """
+    Lanzado si no se pudo inicializar el espacio de trabajo.
+    """
+
+
+class RequestError(BaseError):
+    """
+    Lanzado si hubo un error al realizar una solicitud HTTP.
+    """
+
+    def __init__(self, what: str, status_code: int = 200) -> None:
+        super().__init__(what, status_code)
+
+    @property
+    def status_code(self) -> ExitCode:
+        return self._some_code
+
+
+class AuthorizationExpiredError(RuntimeError):
+    """
+    Lanzado si el token de acceso ha expirado.
     """
 
 
@@ -109,16 +145,6 @@ class NotAFileError(OSError):
     """
 
 
-class RequestError(ConnectionError):
-    """
-    Lanzado si hubo un error al realizar una solicitud HTTP.
-    """
-
-    def __init__(self, status_code: int, message: str) -> None:
-        super().__init__(message)
-        self.status_code: int = status_code
-
-
 class TimeConversionError(ValueError):
     """
     Lanzado si no se pudo convertir una información de tiempo.
@@ -128,24 +154,6 @@ class TimeConversionError(ValueError):
 class UnexpectedResponseError(ConnectionError):
     """
     Lanzado si la respuesta de una solicitud HTTP no es la esperada.
-    """
-
-
-class UninitializedOutputDirError(RuntimeError):
-    """
-    Lanzado si no se pudo inicializar el directorio de salida.
-    """
-
-
-class UninitializedWorkspaceError(RuntimeError):
-    """
-    Lanzado si no se pudo inicializar el espacio de trabajo.
-    """
-
-
-class UnspecifiedCommandError(RuntimeError):
-    """
-    Lanzado si no se pudo inicializar el espacio de trabajo.
     """
 
 
@@ -201,5 +209,4 @@ def get_default_error_handler() -> ErrorHandler:
     return sys.__excepthook__
 
 
-sys.excepthook = _except_hook
 sys.excepthook = _except_hook

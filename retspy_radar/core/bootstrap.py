@@ -32,7 +32,7 @@ class Bootstrap:
         # Si no se especifica un comando, lanzar una excepción
 
         if not namespace.command:
-            raise UnspecifiedCommandError("No se ha especificado un comando")
+            raise UnspecifiedCommandError("No se especificó ninguna acción")
 
         # Si se especifica la opción de inicialización, se crea el
         # archivo de configuración en el espacio de trabajo del usuario
@@ -72,12 +72,11 @@ class Bootstrap:
             or not self._settings.has("services")
         ):
             raise UninitializedWorkspaceError(
-                "El archivo de configuración no existe, "
-                "no es el correcto o está corrupto"
+                "El archivo de configuración no existe o está corrupto"
             )
 
-        product_name = self._settings["product"].as_type(str)
-        product_version = self._settings["version"].as_type(str)
+        product_name: str = self._settings["product"].as_type(str)
+        product_version: str = self._settings["version"].as_type(str)
 
         if product_name != pkg_info.name or not pkg_info.version.startswith(
             product_version
@@ -177,7 +176,7 @@ class Bootstrap:
             config_path, fail_if_not_exists=True
         )
 
-        settings.root.update(self._settings["path"])
+        settings.root.update({"path": self._settings["path"].to_dict()})
 
         return settings
 
@@ -225,10 +224,20 @@ class Bootstrap:
 
             if console.response_is(overwrite, console.NO):
                 raise UninitializedOutputDirError(
-                    "El directorio de salida no existe"
-                )
+                    "El directorio del repositorio no se ha inicializado"
+                ) from FileNotFoundError(output_dir)
 
             os.makedirs(output_dir)
+
+        elif not path.isdir(output_dir):
+            raise UninitializedOutputDirError(
+                "La ruta del repositorio no es un directorio"
+            ) from NotADirectoryError(output_dir)
+
+        elif not os.access(output_dir, os.R_OK + os.W_OK):
+            raise UninitializedOutputDirError(
+                "No se tiene acceso a la ruta del repositorio"
+            ) from PermissionError(output_dir)
 
         self._settings.root.update(
             {

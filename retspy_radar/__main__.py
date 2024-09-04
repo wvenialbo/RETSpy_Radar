@@ -32,16 +32,9 @@ import os
 import sys
 from argparse import ArgumentError
 from types import TracebackType
-from typing import TypeAlias, cast
+from typing import Any, NoReturn, TypeAlias, cast
 
-from .base.exceptions import (
-    ApplicationError,
-    ExitCode,
-    UninitializedOutputDirError,
-    UninitializedWorkspaceError,
-    UnspecifiedCommandError,
-    set_error_handler,
-)
+from .base.exceptions import ApplicationError, ExitCode, set_error_handler
 from .base.logging import Logger, LoggerType, get_logger
 from .base.settings import SettingsBasic
 from .core import Application, Bootstrap, Startup
@@ -57,7 +50,7 @@ def handle_application_error(
     value: BaseException,
     exc_info: ExceptionInfo,
     logger: Logger,
-) -> None:
+) -> NoReturn:
     """
     Manejador de errores de la aplicación.
 
@@ -86,7 +79,7 @@ def handle_application_error(
     logger_call: LoggerType = loggers.get(exc.exit_code, logger.error)
 
     logger_call(
-        "%s: %s (%s).",
+        "%s: %s (exit_code=%s).",
         exc.which,
         exc.what_and_why,
         exc.exit_code,
@@ -96,7 +89,7 @@ def handle_application_error(
     sys.exit(exc.exit_code)
 
 
-def handle_user_interrupt(logger: Logger) -> None:
+def handle_user_interrupt(logger: Logger) -> NoReturn:
     """
     Manejador de interrupciones del usuario.
 
@@ -107,11 +100,53 @@ def handle_user_interrupt(logger: Logger) -> None:
     sys.exit(0)
 
 
+def handle_program_interrupt(value: SystemExit) -> NoReturn:
+    """
+    Manejador de interrupciones del programa.
+
+    Muestra un mensaje de error y finaliza la aplicación.
+    """
+    logger: Logger = get_logger(pkg_info.name)
+
+    logging_call: dict[ExitCode, LoggerType] = {
+        0: logger.info,
+        1: logger.error,
+        2: logger.critical,
+    }
+
+    exit_code: ExitCode = 2
+
+    production_mode: bool = not os.getenv("RETSPY_LEVEL")
+
+    exc_info: BaseException | bool = False if production_mode else value
+
+    exit_message: str = "Se abortó el programa: SystemExit(exit_code=%s)."
+
+    if value.code:
+        tmp_code: Any = value.code
+
+        try:
+            tmp_code = int(tmp_code)
+        except (TypeError, ValueError):
+            tmp_code = exit_code
+
+        exit_code = value.code
+
+        logging_call[tmp_code](exit_message, value, exc_info=exc_info)
+
+    elif not production_mode:
+        exit_code = 0
+
+        logger.debug(exit_message, value.code, exc_info=exc_info)
+
+    sys.exit(exit_code)
+
+
 def main_error_handler(
     exc_type: type[BaseException],
     value: BaseException,
     traceback: TracebackType | None,
-) -> None:
+) -> NoReturn:
     """
     Manejador global de errores.
 
@@ -130,18 +165,41 @@ def main_error_handler(
 
     exc_info: BaseException | bool = False if production_mode else value
 
+    # Errores de solicitud HTTP
+
+    # if isinstance(value, RequestError):
+    #     handle_request_error(value, exc_info, logger)
+
+    # Errores de la aplicación controlados
+
     if isinstance(value, ApplicationError):
         handle_application_error(value, exc_info, logger)
+
+    # Interrupciones del usuario
 
     if exc_type == KeyboardInterrupt:
         handle_user_interrupt(logger)
 
-    logger.exception(
-        "No se puede continuar: Error inesperado: %s: %s.",
-        exc_type.__name__,
-        value or traceback,
-        exc_info=exc_info,
-    )
+    # Errores de argumentos de línea de comandos
+
+    if exc_type == ArgumentError:
+        logger.critical(
+            "Error del analizador de línea de comandos: %s.",
+            value,
+            exc_info=exc_info,
+        )
+
+    # Errores no esperados (no controlados)
+
+    else:
+        logger.exception(
+            "Error inesperado: %s: %s.",
+            exc_type.__name__,
+            value or traceback,
+            exc_info=exc_info,
+        )
+
+    sys.exit(2)
 
 
 def main() -> None:
@@ -151,134 +209,34 @@ def main() -> None:
     Ejecuta los procesos de inicio y arranque de la aplicación, y
     posteriormente inicia la aplicación.
     """
-    # Prepara el entorno de ejecución
-
-    exit_code: ExitCode = 1
-
-    # Crea e inicializa el objeto de registro de eventos
-
-    logger: Logger = get_logger(pkg_info.name)
-
-    # Activa el color de la consola
-
-    os.system("color")
-
-    # Inicia y ejecuta el proceso de inicio
-
-    startup_routines = Startup(__file__)
-    settings: SettingsBasic = startup_routines.run()
-
-    # Inicia y ejecuta el proceso de arranque
-
-    bootstrap_routines = Bootstrap(settings)
-    settings = bootstrap_routines.run()
-
-    # Inicia y ejecuta la aplicación
-
-    application_process = Application(settings)
-    application_process.run()
+    # Proceso principal de inicio y arranque de la aplicación
 
     try:
+        # Activa el color de la consola
 
-        # Errores esperados
+        os.system("color")
+
+        # Inicia y ejecuta el proceso de inicio
+
+        startup_routines = Startup(__file__)
+        settings: SettingsBasic = startup_routines.run()
+
+        # Inicia y ejecuta el proceso de arranque
+
+        bootstrap_routines = Bootstrap(settings)
+        settings = bootstrap_routines.run()
+
+        # Inicia y ejecuta la aplicación
+
+        application_process = Application(settings)
         application_process.run()
 
-    except UninitializedOutputDirError as exc:
-        logger.error(
-            "El directorio del repositorio no se ha inicializado: %s.",
-            exc,
-            exc_info=True,
-        )
-
-    except UninitializedWorkspaceError as exc:
-        logger.error(
-            "El espacio de trabajo no se ha inicializado: %s.",
-            exc,
-            exc_info=True,
-        )
-        logger.info(
-            "Ejecuta el comando '%s init' para inicializar "
-            "el espacio de trabajo.",
-            pkg_info.name,
-        )
-
-    except (NotADirectoryError, IsADirectoryError) as exc:
-        logger.error("Error de archivo de usuario: %s.", exc, exc_info=True)
-
-    except UnspecifiedCommandError as exc:
-        logger.error(
-            "No se especificó ninguna acción: %s.", exc, exc_info=True
-        )
-
-    # Salida invocada por algunos procesos, podría deberse a un error
+    # Salida invocada por algunos procesos (deben verificarse)
 
     except SystemExit as exc:
-        exit_code = exc.code
-
-        if not exit_code:
-            return
-
-        logging_call: dict[int, LoggerType] = {
-            0: logger.info,
-            1: logger.error,
-            2: logger.critical,
-        }
-
-        logging_call[int(exit_code)](
-            "Se abortó el programa: SystemExit(exit_code=%s).", exc
-        )
-
-    # Errores no esperados o no controlados
-
-    except ArgumentError as exc:
-        logger.critical(
-            "Error del analizador de línea de comandos: %s.",
-            exc,
-            exc_info=True,
-        )
-        exit_code = 2
-
-    except FileNotFoundError as exc:
-        logger.critical(
-            "Error de empaquetado de archivos: %s.", exc, exc_info=True
-        )
-        exit_code = 2
-
-    except OSError as exc:
-        logger.exception("Error del sistema: %s.", exc)
-        exit_code = 2
-
-    except (AssertionError, KeyError, TypeError, ValueError) as exc:
-        logger.exception("Error de programación: %s.", exc)
-        exit_code = 2
-
-    # Excepciones no manejadas
-
-    except Exception as exc:
-        logger.exception("No se puede continuar: Error inesperado: %s.", exc)
-        exit_code = 2
-
-    # Finalización de la aplicación
-
-    else:
-        # Salida normal
-
-        exit_code = 0
-
-    finally:
-        # Salida con error (exit_code!=0) / controlada (exit_code==0)
-
-        if exit_code:
-            logger.debug(
-                "Saliendo de {%s} con código de salida %s.",
-                pkg_info.name,
-                exit_code,
-            )
-
-            sys.exit(exit_code)
+        handle_program_interrupt(exc)
 
 
 if __name__ == PARENT_PROCESS:
     set_error_handler(main_error_handler)
-    main()
     main()

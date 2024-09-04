@@ -252,6 +252,20 @@ class Settings:
         return self._settings["server"]["repository_url"].as_type(str)
 
     @property
+    def request_timeout(self) -> int:
+        """
+        Obtiene el tiempo de espera de las solicitudes HTTP.
+
+        Returns
+        -------
+        int
+            El tiempo de espera de las solicitudes HTTP en segundos.
+        """
+        # TODO:FIXME: Implementar la configuración de tiempo de espera
+        # return self._settings["client"]["request_timeout"].as_type(int)
+        return 30
+
+    @property
     def scan_interval(self) -> str:
         """
         Obtiene el intervalo de tiempo de escaneo de las imágenes.
