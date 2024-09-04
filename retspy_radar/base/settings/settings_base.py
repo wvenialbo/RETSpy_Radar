@@ -53,7 +53,7 @@ class SettingsBase(SettingsSection):
         """
         return bool(self._root)
 
-    def __getitem__(self, key: str) -> "SettingsValue":
+    def __getitem__(self, key: str) -> SettingsValue:
         """
         Obtiene un valor o una subsección de ajustes de configuración.
 
@@ -135,7 +135,7 @@ class SettingsBase(SettingsSection):
         return self._root.update(data)
 
     @property
-    def root(self) -> "SettingsValue":
+    def root(self) -> SettingsValue:
         """
         La raíz de los ajustes de configuración.
 
