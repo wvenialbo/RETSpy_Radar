@@ -253,16 +253,32 @@
     "git.enableSmartCommit": true,
     "gitCommitMessageEditor.intelliSense.completion.scopes": [
         {
-            "scope": "retspy",
-            "description": "Main application package (highest)"
+            "scope": "base",
+            "description": "Base subpackage modules (lowest)"
+        },
+        {
+            "scope": "core",
+            "description": "Core subpackage modules (hight)"
+        },
+        {
+            "scope": "ide",
+            "description": "IDE Environment settings"
+        },
+        {
+            "scope": "init",
+            "description": "Init command subpackage modules (mid)"
         },
         {
             "scope": "main",
             "description": "Main application package (highest)"
         },
         {
-            "scope": "core",
-            "description": "Core subpackage modules (hight)"
+            "scope": "retspy",
+            "description": "Main application package (highest)"
+        },
+        {
+            "scope": "shared",
+            "description": "Shared command subpackage modules (low)"
         },
         {
             "scope": "simepar",
@@ -271,18 +287,6 @@
         {
             "scope": "sinarame",
             "description": "SINARAME command subpackage modules (mid)"
-        },
-        {
-            "scope": "init",
-            "description": "Init command subpackage modules (mid)"
-        },
-        {
-            "scope": "shared",
-            "description": "Shared command subpackage modules (low)"
-        },
-        {
-            "scope": "base",
-            "description": "Base subpackage modules (lowest)"
         },
     ],
     // AI assistance tools settings
@@ -363,14 +367,14 @@
     "workbench.editor.decorations.colors": true,
     "workbench.startupEditor": "welcomePage",
     // Grammar/Spelling checking tools settings
-    "cSpell.language": "scientific-terms-us,en-GB,en-US,en,es",
+    "cSpell.language": "scientific-terms-us,en-GB,en-US,en,es,es-ES",
     "cSpell.enableFiletypes": [
         "json",
-        "jsonc",
         "json5",
+        "jsonc",
         "python",
-        "yaml",
         "toml",
+        "yaml"
     ],
     "cSpell.words": [
         "Anguil",
