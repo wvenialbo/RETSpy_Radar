@@ -1,4 +1,5 @@
 from logging import DEBUG, Logger, StreamHandler, getLogger
+from typing import Callable, TypeAlias
 
 from .formatter import LoggerFormatter
 
@@ -89,3 +90,6 @@ def get_logger(
         _logger = instance_logger(name, logger_level, stream_level)
 
     return _logger
+
+
+LoggerType: TypeAlias = Callable[..., None]
