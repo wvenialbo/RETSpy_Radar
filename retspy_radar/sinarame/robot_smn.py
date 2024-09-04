@@ -6,13 +6,13 @@ from typing import Any, Iterator
 from ..base.exceptions import (
     AuthorizationError,
     AuthorizationExpiredError,
-    InvalidConfigurationFileError,
+    ConfigurationFileError,
     RequestError,
     UnexpectedResponseError,
 )
 from ..base.process import ProcessSleep
 from ..base.settings import SettingsBasic
-from ..base.utils import settings as config
+from ..base.utils import settings_manager as config
 from ..base.utils import timing
 from ..shared import RobotBasic, Settings
 from .application_info import app_info
@@ -55,8 +55,7 @@ class RobotSMN(RobotBasic):
         logger : Logger
             El registro de eventos del indexador de imágenes.
         """
-        self._logger: Logger = logger
-        self._settings: Settings = settings
+        super().__init__(settings, logger)
 
         temp_dir: str = tempfile.gettempdir()
         temp_file: str = f"{self.command}.access_key.json"
@@ -158,12 +157,12 @@ class RobotSMN(RobotBasic):
             return token
 
         except (
-            InvalidConfigurationFileError,
+            ConfigurationFileError,
             RequestError,
             UnexpectedResponseError,
         ) as exc:
             raise AuthorizationError(
-                f"No se pudo obtener un token de acceso: {exc}"
+                "No se pudo obtener un token de acceso"
             ) from exc
 
     def _get_api_key(self) -> str:
@@ -227,7 +226,7 @@ class RobotSMN(RobotBasic):
             except RequestError as exc:
                 if exc.status_code in {401}:
                     raise AuthorizationExpiredError(
-                        "El token de autorización ha expirado."
+                        "El token de autorización ha expirado"
                     ) from exc
 
                 raise exc
@@ -290,7 +289,7 @@ class RobotSMN(RobotBasic):
             except RequestError as exc:
                 if exc.status_code in {401}:
                     raise AuthorizationExpiredError(
-                        "El token de autorización ha expirado."
+                        "El token de autorización ha expirado"
                     ) from exc
 
                 raise exc
@@ -311,7 +310,9 @@ class RobotSMN(RobotBasic):
         """
         return self._settings.repository_path
 
-    def _get_token_from_server(self, api_key: str) -> str:
+    def _get_token_from_server(
+        self, api_key: str  # pylint: disable=unused-argument
+    ) -> str:
         """
         Obtiene un token de autorización.
 
@@ -358,7 +359,7 @@ class RobotSMN(RobotBasic):
 
         Raises
         ------
-        InvalidConfigurationFileError
+        ConfigurationFileError
             Si el archivo de credenciales no contiene un token de acceso
             o no es válido.
         """
@@ -369,12 +370,13 @@ class RobotSMN(RobotBasic):
         if not credentials:
             return ""
 
-        if credentials.has("token"):
+        try:
             return credentials["token"].as_type(str)
 
-        raise InvalidConfigurationFileError(
-            "El archivo de credenciales no contiene un token de acceso."
-        )
+        except (KeyError, TypeError, ValueError) as exc:
+            raise AuthorizationError(
+                "El archivo de credenciales no contiene un token de acceso"
+            ) from exc
 
     def _prepare_next_cycle(self) -> None:
         """
@@ -441,7 +443,7 @@ class RobotSMN(RobotBasic):
 
         Raises
         ------
-        InvalidConfigurationFileError
+        ConfigurationFileError
             Si no se pudo guardar el token de acceso en el archivo de
             credenciales.
         """
