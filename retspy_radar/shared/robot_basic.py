@@ -25,6 +25,7 @@ class RobotBase(ABC):
         Ejecuta el proceso de recolección de datos
     """
 
+    @abstractmethod
     def run(
         self,
         station_ids: set[str],
@@ -53,6 +54,67 @@ class RobotBase(ABC):
             recolección de datos.
         """
 
+    command: str = ""
+
+
+class RobotBasic(RobotBase):
+    """
+    Implementación básica para robots de recolección de datos.
+
+    Los robots de recolección de datos son programas que se encargan de
+    recolectar datos de un servicio web y almacenarlos en un repositorio
+    local. Esta clase define la interfaz que deben implementar las
+    clases que representan robots de recolección de datos. Indexador
+    básico de imágenes de radar.
+
+    Methods
+    -------
+    run(station_ids, from_datetime=None, to_datetime=None,
+        for_timedelta=None) Ejecuta el proceso de recolección de datos.
+        Heredado de la clase base `RobotBase`.
+    """
+
+    def __init__(self, settings: Settings, logger: Logger) -> None:
+        """
+        Inicializa una nueva instancia del indexador de imágenes.
+
+        Parameters
+        ----------
+        settings : SettingsSMN
+            Los ajustes de configuración del indexador de imágenes.
+        logger : Logger
+            El registro de eventos del indexador de imágenes.
+        """
+        self._logger: Logger = logger
+        self._settings: Settings = settings
+
+    def run(
+        self,
+        station_ids: set[str],
+        start_time: datetime,
+        end_time: datetime,
+        scan_interval: timedelta,
+    ) -> None:
+        """
+        Ejecuta el proceso de recolección de datos.
+
+        Inicia el proceso de recolección de datos de imágenes de radar
+        de las estaciones especificadas. El proceso de recolección de
+        datos se ejecuta en un bucle hasta que se alcance el tiempo de
+        fin de ejecución de la rutina.
+
+        Parameters
+        ----------
+        station_ids : list[str]
+            Una lista de identificadores de estaciones.
+        start_time : datetime
+            La fecha y hora de inicio de la recolección de datos.
+        end_time : datetime
+            La fecha y hora de fin de la recolección de datos.
+        scan_interval : timedelta
+            El periodo de espera entre ejecuciones del bucle de
+            recolección de datos.
+        """
         # Crear un temporizador para controlar el tiempo de ejecución y
         # esperar hasta el momento de inicio de ejecución de la rutina
 
@@ -103,7 +165,7 @@ class RobotBase(ABC):
                 # imagen en el segundo intento, eliminarla de los
                 # conjuntos de reintento y de imágenes pendientes
 
-                for image_name in retry:
+                for image_name in retry.copy():
                     retry.remove(image_name)
                     pendent.remove(image_name)
 
@@ -111,10 +173,13 @@ class RobotBase(ABC):
 
                 self._prepare_next_cycle()
 
-            except AuthorizationExpiredError:
+            except AuthorizationExpiredError as exc:
                 # Si el token de acceso expiró, obtener un nuevo token
                 # de acceso, reponer el inicio del ciclo actual, y
                 # continuar el proceso de recolección de datos
+                self._logger.warning(
+                    "El token de acceso ha expirado: %s.", exc
+                )
 
                 access_token = self._get_access_token(API_KEY, True)
 
@@ -281,43 +346,3 @@ class RobotBase(ABC):
 
         Imprime el pie de página del programa en la consola.
         """
-
-    command: str = ""
-
-
-class RobotBasic(RobotBase):
-    """
-    Indexador de imágenes de radar del SINARAME.
-
-    El indexador de imágenes de radar del Sistema Nacional de Radares
-    Meteorológicos (SINARAME), del Servicio Meteorológico Nacional (SMN)
-    argentino, permite descargar las imágenes de radar de las estaciones
-    del SINARAME desde el sitio web de la SMN para guardarlas en un
-    repositorio local. Las imágenes de radar se actualizan cada 10
-    minutos.
-
-    El objetivo del bot es recopilar las imágenes de radar asociadas a
-    eventos meteorológicos extremos en la región de interés, para
-    archivarlos en una base de datos de reportes de eventos de tiempo
-    severo, para su análisis o estudio posterior.
-
-    Methods
-    -------
-    run(station_ids, from_datetime=None, to_datetime=None,
-        for_timedelta=None) Ejecuta el proceso de recolección de datos.
-        Heredado de la clase base `RobotBase`.
-    """
-
-    def __init__(self, settings: Settings, logger: Logger) -> None:
-        """
-        Inicializa una nueva instancia del indexador de imágenes.
-
-        Parameters
-        ----------
-        settings : SettingsSMN
-            Los ajustes de configuración del indexador de imágenes.
-        logger : Logger
-            El registro de eventos del indexador de imágenes.
-        """
-        self._logger: Logger = logger
-        self._settings: Settings = settings
