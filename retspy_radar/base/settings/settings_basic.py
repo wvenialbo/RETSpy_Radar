@@ -1,18 +1,36 @@
+"""
+Define un manipulador básico de ajustes de configuración.
+
+La clase `SettingsBasic` proporciona funciones básicas para manipular,
+cargar y guardar ajustes de configuración en un archivo.
+
+Las clases de este módulo son:
+
+    - `SettingsBasic`: Ajustes de configuración básico.
+
+Las funciones de `SettingsBasic` son:
+
+    - `load`: Carga los ajustes de configuración desde un archivo.
+    - `save`: Guarda los ajustes de configuración en un archivo.
+"""
+
 import json
 from io import TextIOWrapper
 from json import JSONDecodeError
 from typing import Any
 
-from ..exceptions import InvalidConfigurationFileError
+from ..exceptions import ConfigurationFileError
 from .settings_base import SettingsBase
 
 
 class SettingsBasic(SettingsBase):
     """
-    Ajustes de configuración básicos para el robot.
+    Manipulador básico de ajustes de configuración.
 
     Methods
     -------
+    dump(file: TextIOWrapper) -> None
+        Guarda los ajustes de configuración en un archivo.
     load(settings_path: str) -> SettingsBasic
         Carga los ajustes de configuración desde un archivo.
 
@@ -21,19 +39,6 @@ class SettingsBasic(SettingsBase):
     root : Section
         Obtiene la raíz de los ajustes de configuración.
     """
-
-    def __init__(self, data: Any | None = None) -> None:
-        """
-        Inicializa los ajustes de configuración.
-
-        Parameters
-        ----------
-        settings : Any, optional
-            Un diccionario con los ajustes de configuración. Si no se
-            especifica, se crea una sección de ajustes de configuración
-            vacía.
-        """
-        super().__init__(data)
 
     def dump(self, file: TextIOWrapper) -> None:
         """
@@ -46,18 +51,18 @@ class SettingsBasic(SettingsBase):
 
         Raises
         ------
-        InvalidConfigurationFileError
+        ConfigurationFileError
             Si no se pudieron guardar los ajustes de configuración.
         """
         try:
             # Escribir los ajustes de configuración en el archivo
 
-            json.dump(self._root.to_dict(), file, indent=4)
+            json.dump(self._root.to_dict(), file, indent=4, allow_nan=False)
 
-        except TypeError:
-            raise InvalidConfigurationFileError(
+        except (RecursionError, TypeError, ValueError) as exc:
+            raise ConfigurationFileError(
                 "No se pudieron guardar los ajustes de configuración"
-            )
+            ) from exc
 
     def load(self, file: TextIOWrapper) -> None:
         """
@@ -70,7 +75,7 @@ class SettingsBasic(SettingsBase):
 
         Raises
         ------
-        InvalidConfigurationFileError
+        ConfigurationFileError
             Si no se pudieron cargar los ajustes de configuración.
         """
         try:
@@ -82,7 +87,6 @@ class SettingsBasic(SettingsBase):
             self.update(settings)
 
         except JSONDecodeError as exc:
-            raise InvalidConfigurationFileError(
-                "El archivo de configuración no tiene formato "
-                f"JSON válido: {exc}"
+            raise ConfigurationFileError(
+                "No se pudieron cargar los ajustes de configuración"
             ) from exc
