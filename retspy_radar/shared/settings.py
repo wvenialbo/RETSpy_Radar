@@ -1,6 +1,6 @@
 from typing import Any
 
-from ..base.exceptions import InvalidConfigurationFileError
+from ..base.exceptions import ConfigurationFileError
 from ..base.settings import SettingsValue
 
 
@@ -16,7 +16,7 @@ class Settings:
 
         Raises
         ------
-        InvalidConfigurationFileError
+        ConfigurationFileError
             Si alguna configuración no es válida.
         """
         service_id: str = settings["args"]["command"].as_type(str)
@@ -30,41 +30,57 @@ class Settings:
             settings["timing"].update(service["timing"])
 
         try:
-            assert service.has("metadata"), "Falta información del servicio"
+            preamble = f"El servicio '{service_id}' "
+
+            assert service.has("metadata"), f"{preamble} no tiene metadatos"
+
             assert service["metadata"].has(
                 "name"
-            ), "Falta el nombre del servicio"
+            ), f"{preamble} no tiene nombre"
+
             assert service["metadata"].has(
                 "description"
-            ), "Falta la descripción del servicio"
+            ), f"{preamble} no tiene descripción"
+
             assert service["metadata"].has(
                 "organization"
-            ), "Falta la organización del servicio"
+            ), f"{preamble} no tiene nombre organización"
+
             assert service["metadata"].has(
                 "country"
-            ), "Falta el país del servicio"
+            ), f"{preamble} no tiene país de origen"
+
             assert service["metadata"].has(
                 "product"
-            ), "Falta el producto del servicio"
+            ), f"{preamble} no tiene información de producto"
 
-            assert service.has("server"), "Falta información del servidor"
+            assert service.has(
+                "server"
+            ), f"{preamble} no tiene información de servidor"
+
             assert service["server"].has(
                 "base_url"
-            ), "Falta la URL base del servicio"
+            ), f"{preamble} no tiene la URL del sitio web"
+
             assert service["server"].has(
                 "radar_url"
-            ), "Falta la URL de radar del servicio"
+            ), f"{preamble} no tiene la URL de la página radar"
+
             assert service["server"].has(
                 "inventory_url"
-            ), "Falta la URL de inventario del servicio"
+            ), f"{preamble} no tiene la URL de acceso al inventario"
+
             assert service["server"].has(
                 "repository_url"
-            ), "Falta la URL de repositorio del servicio"
+            ), f"{preamble} no tiene la URL del repositorio"
 
             assert service.has(
                 "station_groups"
-            ), "Falta información de grupos de estaciones"
-            assert service.has("stations"), "Falta información de estaciones"
+            ), f"{preamble} no tiene información de grupos de estaciones"
+
+            assert service.has(
+                "stations"
+            ), f"{preamble} no tiene lista de estaciones"
 
             stations: dict[str, dict[str, Any]] = service["stations"].to_dict()
 
@@ -79,25 +95,28 @@ class Settings:
                     ), f"La estación '{station_id}' no existe"
 
             for station_id in stations.keys():
-                assert service["stations"][station_id].has(
+                station_info: SettingsValue = service["stations"]
+
+                assert station_info[station_id].has(
                     "name"
                 ), f"La estación '{station_id}' no tiene nombre"
-                assert service["stations"][station_id].has(
+
+                assert station_info[station_id].has(
                     "lat"
                 ), f"La estación '{station_id}' no tiene latitud"
-                assert service["stations"][station_id].has(
+
+                assert station_info[station_id].has(
                     "lon"
                 ), f"La estación '{station_id}' no tiene longitud"
 
         except KeyError as exc:
-            raise InvalidConfigurationFileError(
-                f"La clave {exc} no existe en el archivo de configuración"
+            raise ConfigurationFileError(
+                "No existe la entrada en el archivo de configuración"
             ) from exc
 
         except AssertionError as exc:
-            raise InvalidConfigurationFileError(
-                "El archivo de configuración no es válido o está corrupto: "
-                f"{exc}"
+            raise ConfigurationFileError(
+                "El archivo de configuración no es válido"
             ) from exc
 
         service_dict: dict[str, Any] = service.to_dict()
