@@ -3,7 +3,7 @@ from os import path
 
 from ..application_info import app_info
 from ..base.settings import SettingsBasic
-from ..base.utils import settings as config
+from ..base.utils import settings_manager as config
 
 
 class Startup:

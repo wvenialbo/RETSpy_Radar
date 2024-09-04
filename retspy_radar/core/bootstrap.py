@@ -11,7 +11,7 @@ from ..base.exceptions import (
 )
 from ..base.settings import SettingsBasic, SettingsValue
 from ..base.utils import console
-from ..base.utils import settings as config
+from ..base.utils import settings_manager as config
 from ..package_info import pkg_info
 from .cli_parser import CLINamespace, CLIParser
 
