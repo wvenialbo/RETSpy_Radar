@@ -92,19 +92,7 @@
         "--no-pretty",
         "--check-untyped-defs",
     ],
-    "pylint.args": [
-        "--allow-reexport-from-package=true",
-        "--disable=C0114,C0115,C0116",
-        // C0114:missing-module-docstring
-        // C0115:missing-class-docstring
-        // C0116:missing-function-docstring
-        "--expected-line-ending-format=LF", //
-        "--generated-members=cv.*", //
-        "--load-plugins=pylint.extensions.magic_value", //
-        "--max-line-length=79", //
-        "--notes=FIXME,XXX,TODO,WARNING",
-        "--good-names=\"\"" //
-    ],
+    "pylint.args": [],
     // Python formatting tools settings
     "autopep8.args": [
         "--max-line-length=79",
@@ -320,6 +308,7 @@
     "files.exclude": {
         "**/__pycache__": true,
         "**/.git": true,
+        "**/.github": true,
         "**/.idea": true,
         "**/.ipynb_checkpoints": true,
         "**/.venv": true,
