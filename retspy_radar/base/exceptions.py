@@ -11,6 +11,9 @@ ErrorHandler: TypeAlias = Callable[..., None]
 
 
 class ApplicationError(Exception):
+    """
+    Lanzado si hubo un error en la aplicación.
+    """
 
     def __init__(self, what: str, exit_code: ExitCode = 1) -> None:
         super().__init__(what)
