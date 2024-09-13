@@ -8,6 +8,10 @@ $project = 'retspy_radar'
 
 & ./.venv/Scripts/Activate.ps1
 
+# Install/Update the `findpydeps` tool package
+
+pip install findpydeps --upgrade
+
 # Get the list of installed packages >> 'installed.txt'
 
 $installed_pkgs = 'installed.txt'

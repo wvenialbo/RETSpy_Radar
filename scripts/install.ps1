@@ -7,7 +7,7 @@
 $venv = '.venv'
 
 If (-not (Test-Path -Path $venv)) {
-    python -m venv $venv
+    python -m venv $venv --copies
 }
 
 # Activate the environment
@@ -16,7 +16,7 @@ If (-not (Test-Path -Path $venv)) {
 
 # Install development time packages, if any
 
-$packages = 'build', 'findpydeps', 'wheel', 'jupyterlab' # for prototyping
+$packages = 'jupyterlab' # for prototyping
 
 Foreach ($package in $packages) {
     pip install $package --upgrade
